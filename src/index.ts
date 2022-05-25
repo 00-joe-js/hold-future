@@ -30,12 +30,13 @@ import setupFPSCharacter from "./firstPersonCharacter";
 const RESOLUTION = 16 / 9;
 
 import Player from "./firstPersonCharacter/PlayerClass";
+import { RegisteredItem } from "./firstPersonCharacter/itemPickup";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(50, RESOLUTION, 1, 10000);
 
 const player = new Player(camera);
-player.setWorldPosition(new Vector3(0, 0, 4700));
+player.setWorldPosition(new Vector3(0, 100, 100));
 
 // randos.
 const randomColor = () => {
@@ -44,14 +45,14 @@ const randomColor = () => {
     return color;
 };
 
-const createRandos = () => {
+const createRandos = (registerCollide: (item: RegisteredItem) => void) => {
     const AMOUNT = 20;
     const DISTANCE = 1.0;
 
     const gameLoopFns = [];
 
     for (let i = 0; i < AMOUNT; i++) {
-        const sphereG = new SphereBufferGeometry(MathUtils.randFloat(5.0,8.5), MathUtils.randInt(7, 15), MathUtils.randInt(10, 20));
+        const sphereG = new SphereBufferGeometry(MathUtils.randFloat(5.0, 8.5), MathUtils.randInt(7, 15), MathUtils.randInt(10, 20));
 
         let offsets = new Float32Array();
         for (let i = 0; i < sphereG.attributes.position.count; i++) {
@@ -87,6 +88,13 @@ const createRandos = () => {
         sphere.position.z = orbitRadius * Math.sin(MathUtils.randFloat(0, PI2));
 
         scene.add(sphere);
+
+        registerCollide({
+            obj: sphere,
+            whenInRange: () => {
+                scene.remove(sphere);
+            }
+        });
 
         const initialY = sphere.position.y;
         const offset = MathUtils.randInt(0, 5000);
@@ -132,14 +140,14 @@ const configureTower = (towerGroup: Group) => {
 (async () => {
 
     const models = await loadModels();
-    loopHooks.push(await setupFPSCharacter(camera, scene));
+
+    const { gameLoopFn, registerCollidingItem } = await setupFPSCharacter(camera, scene);
+    loopHooks.push(gameLoopFn);
 
     renderLoop(scene, camera, (dt) => {
 
         if (sceneMade === false) {
             sceneMade = true;
-
-            loopHooks = loopHooks.concat(...createRandos());
 
             const tower = models[0].scene;
             configureTower(tower);
@@ -199,12 +207,18 @@ const configureTower = (towerGroup: Group) => {
             ramp.position.y = 3;
             ramp.setRotationFromEuler(new Euler(0, 0, Math.PI / 6));
             scene.add(ramp);
-            
+
             ground.name = "ground";
             ground.layers.enable(7);
             ramp.layers.enable(7);
             ground.position.y = -2;
             scene.add(ground);
+
+            // registerCollidingItem({
+            //     obj: ground, whenInRange: () => {
+            //         console.log("hiiiiiiiiiii");
+            //     }
+            // });
 
             const ambient = new AmbientLight(0xffffff, 0.2);
             scene.add(ambient);
@@ -219,6 +233,8 @@ const configureTower = (towerGroup: Group) => {
                 directional.position.x = Math.cos(theta * 0.7);
                 directional.position.z = Math.sin(theta * 2);
             });
+
+            loopHooks = loopHooks.concat(...createRandos(registerCollidingItem));
 
         }
 

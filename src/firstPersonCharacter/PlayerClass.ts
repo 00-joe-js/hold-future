@@ -9,7 +9,7 @@ class Player {
     }
 
     setWorldPosition(pos: Vector3) {
-        this.camera.position.z = pos.z;
+        this.camera.position.copy(pos);
     }
 
 }

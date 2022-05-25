@@ -1,6 +1,7 @@
 import { Camera, Vector3, Euler, MathUtils, BufferGeometry, LineBasicMaterial, Line, Scene, Raycaster, Event, Layers, Intersection, Object3D, Matrix3, Color } from "three";
 
 import Keyboard, { MouseInterface, GamepadInterface } from "./inputHelper";
+import ItemPickupManager, { RegisteredItem } from "./itemPickup";
 
 const canvasElement = document.querySelector("#three-canvas");
 
@@ -25,7 +26,7 @@ canvasElement.addEventListener("click", () => {
 const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     const gamepad = new GamepadInterface();
-    await gamepad.waitForGamepadConnect();
+    // await gamepad.waitForGamepadConnect();
 
     const keyboard = new Keyboard();
     const mouse = new MouseInterface();
@@ -313,8 +314,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     let preventMovement = false;
 
+    const itemPickupManager = new ItemPickupManager(camera);
+
+
     // Function to run on game loop.
-    return (dt: number) => {
+    const gameLoopFn = (dt: number) => {
 
         const gamepadState = gamepad.getState();
         const movementVector = new Vector3(0, 0, 0);
@@ -397,12 +401,24 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
         const finalGrounded = checkIsGrounded(camera.position);
         if (finalGrounded.grounded) {
+            // Lifts the camera away from solid surface beneath.
             graduallyMaintainHeight(finalGrounded.solidSurfacesBelow[0].distance);
         }
 
+        // Cancels sprinting if not moving.
         checkCancelSprinting(movementVector);
         drawCrosshair();
 
+        itemPickupManager.testAndTriggerListeners();
+
+    };
+
+
+    return {
+        gameLoopFn,
+        registerCollidingItem: (item: RegisteredItem) => {
+            itemPickupManager.registerPickupableItem(item);
+        }
     };
 
 };
