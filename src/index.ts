@@ -149,18 +149,6 @@ const configureTower = (towerGroup: Group) => {
         if (sceneMade === false) {
             sceneMade = true;
 
-            const tower = models[0].scene;
-            configureTower(tower);
-            scene.add(tower);
-
-            const ramps = models[1].scene;
-            ramps.scale.set(400, 400, 400);
-            ramps.position.z = -500;
-            ramps.position.y = 0;
-            ramps.layers.enable(7);
-            ramps.children.forEach(m => m.layers.enable(7));
-            scene.add(ramps);
-
             const u = { uTime: { value: 0.0 } };
             const groundMat = new ShaderMaterial({
                 wireframe: true,
@@ -195,9 +183,8 @@ const configureTower = (towerGroup: Group) => {
                 u.uTime.value = dt;
             })
 
-            const GROUND_SIZE = 10000;
 
-            const groundG = new BoxGeometry(GROUND_SIZE, 0, GROUND_SIZE, 70, 1, 70);
+            const groundG = new BoxGeometry(1000, 0, 100000, 10, 1, 1000);
             const ground = new Mesh(groundG, groundMat);
             const rampG = new BoxGeometry(1000, 30, 30, 40, 40, 3);
             const ramp = new Mesh(rampG, new MeshPhongMaterial({ color: 0xaaaaaa }));

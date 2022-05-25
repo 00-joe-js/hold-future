@@ -5,12 +5,13 @@ import ItemPickupManager, { RegisteredItem } from "./itemPickup";
 
 const canvasElement = document.querySelector("#three-canvas");
 
-const SPEED = 0.7;
+const SPEED = 3;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 const MIN_POLAR_ANGLE = -MAX_POLAR_ANGLE;
 const SOLID_LAYER = 7;
 const CAN_SPRINT_IN_AIR = true;
-const PLAYER_HEIGHT = 15;
+const PLAYER_HEIGHT = 30;
+const JUMP_FORCE = 1.2;
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3(0, 0, 0);
@@ -132,7 +133,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const aheadOfCameraBeforeReposition = getPointAheadOfCamera();
         const vel = movementVector.clone().multiply(new Vector3(1, 0, 1)).length();
 
-        const getWavePoint = () => Math.abs(Math.sin(headBobDelta * 1)) * 0.2;
+        const getWavePoint = () => Math.abs(Math.sin(headBobDelta * 1)) * 0.5;
         const currentWavePoint = getWavePoint();
 
         if (vel > 0) {
@@ -294,7 +295,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             if (!isSlipping) {
                 let spaceDown = getSpacePress(jumpButtonDown);
                 if (spaceDown) {
-                    aerialVector.add(new Vector3(0, 0.4 * (sprinting ? 3 : 1), 0));
+                    aerialVector.add(new Vector3(0, JUMP_FORCE * (sprinting ? 3 : 1), 0));
                     fall(deltaTimeSinceSceneStart);
                 }
             }
@@ -397,9 +398,12 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             applyCameraRotation({ xVelocity: mouse.movement.x, yVelocity: mouse.movement.y }, _euler);
         }
 
-        applyHeadBob(movementVector);
-
         const finalGrounded = checkIsGrounded(camera.position);
+
+        if (finalGrounded.grounded) {
+            applyHeadBob(movementVector);
+        }
+
         if (finalGrounded.grounded) {
             // Lifts the camera away from solid surface beneath.
             graduallyMaintainHeight(finalGrounded.solidSurfacesBelow[0].distance);
