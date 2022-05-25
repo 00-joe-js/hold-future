@@ -5,12 +5,12 @@ import ItemPickupManager, { RegisteredItem } from "./itemPickup";
 
 const canvasElement = document.querySelector("#three-canvas");
 
-const SPEED = 3;
+let SPEED = 5;
 const MAX_POLAR_ANGLE = MathUtils.degToRad(85);
 const MIN_POLAR_ANGLE = -MAX_POLAR_ANGLE;
 const SOLID_LAYER = 7;
 const CAN_SPRINT_IN_AIR = true;
-const PLAYER_HEIGHT = 30;
+const PLAYER_HEIGHT = 60;
 const JUMP_FORCE = 1.2;
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
@@ -133,17 +133,17 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const aheadOfCameraBeforeReposition = getPointAheadOfCamera();
         const vel = movementVector.clone().multiply(new Vector3(1, 0, 1)).length();
 
-        const getWavePoint = () => Math.abs(Math.sin(headBobDelta * 1)) * 0.5;
+        const getWavePoint = () => Math.abs(Math.sin(headBobDelta / 2.5)) * 0.7;
         const currentWavePoint = getWavePoint();
 
         if (vel > 0) {
-            headBobDelta += .1 + (sprinting ? .05 : 0);
+            headBobDelta += .2 + (sprinting ? .05 : 0);
             camera.position.y += getWavePoint() - currentWavePoint;
         } else if (currentWavePoint > .1) {
-            headBobDelta += .1 + (sprinting ? .05 : 0);
+            headBobDelta += .2 + (sprinting ? .05 : 0);
             const newWavePoint = getWavePoint();
             if (newWavePoint > currentWavePoint) {
-                headBobDelta -= .2 + (sprinting ? .05 : 0);
+                headBobDelta -= .3 + (sprinting ? .05 : 0);
             }
             camera.position.y += getWavePoint() - currentWavePoint;
         }
@@ -166,7 +166,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const newLine = new Line(geometry, material);
 
         if (sprinting) {
-            newLine.material.color = new Color(1, 1, 1);
+            newLine.material.color = POWERED_PINKRED;
         } else {
             newLine.material.color = HYPER_BLUE;
         }
@@ -417,11 +417,20 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     };
 
-
     return {
         gameLoopFn,
-        registerCollidingItem: (item: RegisteredItem) => {
+        registerCollidingItem(item: RegisteredItem) {
             itemPickupManager.registerPickupableItem(item);
+        },
+        getSpeed() {
+            return SPEED;
+        },
+        changeSpeed(d: number) {
+            SPEED += d;
+            return SPEED;
+        },
+        setSpeed(v: number) {
+            SPEED = v;
         }
     };
 

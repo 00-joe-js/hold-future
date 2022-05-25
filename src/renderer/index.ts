@@ -23,7 +23,7 @@ const composer = new EffectComposer(renderer);
 
 renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
 composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
-renderer.setClearColor(0x222200);
+renderer.setClearColor(0x000000);
 
 export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) => void) => {
 

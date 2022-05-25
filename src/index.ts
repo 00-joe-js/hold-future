@@ -15,6 +15,7 @@ declare global {
     var RED: Color;
     var BLUE: Color;
     var HYPER_BLUE: Color;
+    var POWERED_PINKRED: Color;
 }
 window.PI = Math.PI;
 window.PI2 = Math.PI * 2;
@@ -22,6 +23,7 @@ window.ZERO_VEC3 = new Vector3(0, 0, 0);
 window.RED = new Color(0xff0000);
 window.BLUE = new Color(0x0000ff);
 window.HYPER_BLUE = new Color(0xaaffff);
+window.POWERED_PINKRED = new Color(0xffeeee);
 // ---
 
 import { renderLoop } from "./renderer";
@@ -31,12 +33,14 @@ const RESOLUTION = 16 / 9;
 
 import Player from "./firstPersonCharacter/PlayerClass";
 import { RegisteredItem } from "./firstPersonCharacter/itemPickup";
+import createSkybox from "./level/skybox";
+import globalTime from "./subscribe-to-global-render-loop";
+import createGround from "./level/groundPath";
+import createSpeedFruit from "./items/speedFruit";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(50, RESOLUTION, 1, 10000);
+const camera = new PerspectiveCamera(80, RESOLUTION, 1, 1500000);
 
-const player = new Player(camera);
-player.setWorldPosition(new Vector3(0, 100, 100));
 
 // randos.
 const randomColor = () => {
@@ -118,110 +122,64 @@ let sceneMade = false;
 
 let loopHooks: Array<(dt: number) => void> = [];
 
-const configureTower = (towerGroup: Group) => {
-    const scale = 400;
-    towerGroup.scale.set(scale, scale * 1.2, scale);
-    towerGroup.position.z = -500;
-    towerGroup.position.y = -10;
-    towerGroup.layers.enable(7);
-    towerGroup.children.forEach(m => {
-        if (!(m instanceof Mesh)) {
-            throw new Error("Not a mesh.");
-        }
-        if (m.name === "Obelisk") {
-            m.material = new MeshPhongMaterial({ color: 0x000000, specular: 0xffffff });
-        } else {
-            m.material = new MeshPhongMaterial({ color: 0xffff00, specular: 0xffffff });
-        }
-        m.layers.enable(7);
-    });
-};
-
 (async () => {
 
+    const skybox = await createSkybox();
     const models = await loadModels();
 
-    const { gameLoopFn, registerCollidingItem } = await setupFPSCharacter(camera, scene);
+    const { gameLoopFn, registerCollidingItem, changeSpeed } = await setupFPSCharacter(camera, scene);
+
     loopHooks.push(gameLoopFn);
+
+    loopHooks.push((dt) => {
+        globalTime.provideTime(dt);
+    });
 
     renderLoop(scene, camera, (dt) => {
 
         if (sceneMade === false) {
+
+            const player = new Player(camera);
+            player.setWorldPosition(new Vector3(0, 100, 100));
+
             sceneMade = true;
 
-            const u = { uTime: { value: 0.0 } };
-            const groundMat = new ShaderMaterial({
-                wireframe: true,
-                uniforms: u,
-                vertexShader: `
-                uniform float uTime;
-                uniform float uSeed;
-                float rand(float n){return fract(sin(n) * 43758.5453123);}
-                float noise(float p){
-                    float fl = floor(p);
-                    float fc = fract(p);
-                    return mix(rand(fl), rand(fl + 1.0), fc);
-                }
-                varying vec3 vPos;
-                void main() {
-                    vec3 pos = position + vec3(0.0, noise((position.x / 200.0) + (position.z) + (uTime / 1500.0)) * -60.0, (sin(uTime) / 2000.0));
-                    vPos = pos;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
-                }
-                `,
-                fragmentShader: `
-                uniform float uTime;
-                varying vec3 vPos;
-                void main() {
-                    vec3 color = vec3(0.0 + (abs(vPos.y) / 50.0), sin(vPos.z / 100.0 + (uTime / 200.0)), abs(sin(vPos.y)));
-                    gl_FragColor = vec4(color, 1.0);
-                }
-                `
-            });
+            scene.add(skybox);
 
-            loopHooks.push(dt => {
-                u.uTime.value = dt;
-            })
-
-
-            const groundG = new BoxGeometry(1000, 0, 100000, 10, 1, 1000);
-            const ground = new Mesh(groundG, groundMat);
-            const rampG = new BoxGeometry(1000, 30, 30, 40, 40, 3);
-            const ramp = new Mesh(rampG, new MeshPhongMaterial({ color: 0xaaaaaa }));
-
-            ramp.position.z = -30;
-            ramp.position.x = 100;
-            ramp.position.y = 3;
-            ramp.setRotationFromEuler(new Euler(0, 0, Math.PI / 6));
-            scene.add(ramp);
-
-            ground.name = "ground";
-            ground.layers.enable(7);
-            ramp.layers.enable(7);
-            ground.position.y = -2;
-            scene.add(ground);
+            const newGround = createGround();
+            scene.add(newGround);
 
             // registerCollidingItem({
-            //     obj: ground, whenInRange: () => {
-            //         console.log("hiiiiiiiiiii");
+            //     obj: newGround,
+            //     whenInRange: () => {
+            //         console.log("Standing on me.");
             //     }
-            // });
+            // })
 
             const ambient = new AmbientLight(0xffffff, 0.2);
             scene.add(ambient);
 
-            const directional = new DirectionalLight(0xffff00, 0.1);
-            directional.position.y = -1;
-            scene.add(directional);
 
-            loopHooks.push(dt => {
-                const theta = dt / 300;
-                directional.position.y = -1 + ((Math.sin(theta) + 1) / 2) * 2;
-                directional.position.x = Math.cos(theta * 0.7);
-                directional.position.z = Math.sin(theta * 2);
+            const randomPoints = [];
+
+            for (let i = 0; i < 1000; i++) {
+                randomPoints.push(new Vector3((Math.random() - 0.5) * 1500, 40, Math.random() * -500000));
+            }
+
+            const fruits = randomPoints.map(pt => createSpeedFruit(pt, changeSpeed, (group: Group) => {
+                scene.remove(group);
+            }));
+
+            fruits.forEach(f => {
+                scene.add(f.obj)
+                loopHooks.push(f.onLoop);
+                registerCollidingItem({
+                    obj: f.collidingObj,
+                    whenInRange: () => {
+                        f.onPlayerCollide();
+                    }
+                });
             });
-
-            loopHooks = loopHooks.concat(...createRandos(registerCollidingItem));
 
         }
 

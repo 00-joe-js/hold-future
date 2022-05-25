@@ -1,7 +1,7 @@
-import { Object3D, Vector3, Raycaster, SphereBufferGeometry, Sphere, Camera, Mesh, Box3 } from "three";
+import { Object3D, Vector3, Raycaster, SphereBufferGeometry, Sphere, Camera, Mesh, Box3, Group } from "three";
 
 export interface RegisteredItem {
-    obj: Mesh,
+    obj: Mesh | Group,
     whenInRange: () => void
 }
 
@@ -13,7 +13,7 @@ class ItemPickupManager {
     private collidingArea: Sphere;
     private pickupableItems: RegisteredItem[] = [];
 
-    constructor(playerObj: Object3D, collisionDistance = 40) {
+    constructor(playerObj: Object3D, collisionDistance = 70) {
         this.collisionDistance = collisionDistance;
         this.playerObj = playerObj;
         this.collidingArea = new Sphere(playerObj.position, this.collisionDistance);
@@ -32,17 +32,17 @@ class ItemPickupManager {
 
         this.pickupableItems.forEach(({ obj, whenInRange }) => {
 
-            obj.geometry.computeBoundingBox();
+            const objBox = new Box3();
+            objBox.setFromObject(obj);
 
-            const originalBoundingBox = obj.geometry.boundingBox;
-            if (!(originalBoundingBox instanceof Box3)) {
-                throw new Error("Couldn't compute or access bounding box. Why?");
-            }
+            // console.group();
+            // console.log("Obj box min", objBox.min);
+            // console.log("Obj box max", objBox.max);
+            // console.log("Center", this.collidingArea.center);
+            // console.log(this.collidingArea.intersectsBox(objBox));
+            // console.groupEnd();
 
-            const boxContainingObj = originalBoundingBox.clone();
-            boxContainingObj.applyMatrix4(obj.matrixWorld);
-
-            if (this.collidingArea.intersectsBox(boxContainingObj)) {
+            if (this.collidingArea.intersectsBox(objBox)) {
                 whenInRange();
             }
 
@@ -53,11 +53,6 @@ class ItemPickupManager {
 
     onUpdate() {
         this.collidingArea.set(this.playerObj.position, this.collisionDistance);
-        if (Math.random() < 0) {
-            console.log("Sphere area", this.collidingArea.center);
-            console.log("Camera pos", this.playerObj.position);
-        }
-
     }
 }
 
