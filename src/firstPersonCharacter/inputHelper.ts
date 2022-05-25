@@ -147,10 +147,10 @@ export class GamepadInterface {
         const xDown = buttonValues[3] === 1;
         const zRDown = buttonValues[7] === 1;
 
-        const moveScale = 1.5;
-        const moveVel = new Vector2(gamepad.axes[0] * moveScale, gamepad.axes[1] * moveScale * -1);
+        const moveScale = 2;
+        const moveVel = new Vector2(gamepad.axes[0], gamepad.axes[1] * moveScale * -1);
 
-        const lookScale = 40;
+        const lookScale = 30;
         const lookVel = new Vector2(gamepad.axes[2] * lookScale, gamepad.axes[3] * lookScale);
         return { lookVel, moveVel, xDown, zRDown };
     }

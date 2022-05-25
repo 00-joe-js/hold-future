@@ -25,3 +25,13 @@ html, body {
     box-sizing: content-box;
     border: 2px solid black;
 }
+
+#speed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-size: 3rem;
+    background: black;
+    color: white;
+    padding: 1rem;
+}

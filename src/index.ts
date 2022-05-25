@@ -39,7 +39,7 @@ import createGround from "./level/groundPath";
 import createSpeedFruit from "./items/speedFruit";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(80, RESOLUTION, 1, 1500000);
+const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
 
 
 // randos.
@@ -127,7 +127,7 @@ let loopHooks: Array<(dt: number) => void> = [];
     const skybox = await createSkybox();
     const models = await loadModels();
 
-    const { gameLoopFn, registerCollidingItem, changeSpeed } = await setupFPSCharacter(camera, scene);
+    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed } = await setupFPSCharacter(camera, scene);
 
     loopHooks.push(gameLoopFn);
 
@@ -135,35 +135,67 @@ let loopHooks: Array<(dt: number) => void> = [];
         globalTime.provideTime(dt);
     });
 
+    const speedInterface = document.querySelector<HTMLElement>("#speed");
+    if (!speedInterface) throw new Error("Speed interface?");
+    loopHooks.push(() => {
+        speedInterface.innerText = getSpeed().toFixed(1);
+    });
+
     renderLoop(scene, camera, (dt) => {
 
         if (sceneMade === false) {
 
             const player = new Player(camera);
-            player.setWorldPosition(new Vector3(0, 100, 100));
+            player.setWorldPosition(new Vector3(0, 210, 0));
+            camera.rotation.y = -Math.PI / 2;
 
             sceneMade = true;
 
             scene.add(skybox);
 
-            const newGround = createGround();
-            scene.add(newGround);
+            const { ground, goal } = createGround();
+            scene.add(ground);
+            scene.add(goal);
 
-            // registerCollidingItem({
-            //     obj: newGround,
-            //     whenInRange: () => {
-            //         console.log("Standing on me.");
-            //     }
-            // })
+            const start = Date.now();
+            let once = false;
+            registerCollidingItem({
+                obj: goal,
+                whenInRange: () => {
+                    if (!once) {
+                        const finishTime = Date.now() - start;
+                        once = true;
+                        const getRank = (time: number) => {
+                            time = time / 1000;
+                            if (time > 24) {
+                                return "Kinda Slow";
+                            } else if (time > 21) {
+                                return "Pretty Good";
+                            } else if (time > 17) {
+                                return "Nice and Speedy";
+                            } else {
+                                return "Damn Fast";
+                            }
+                        };
+                        alert(`
+                            You reached the goal.
+                            Max speed: ${getSpeed().toFixed(1)}
+                            Time to goal: ${(finishTime / 1000).toFixed(1)} seconds (${finishTime}ms)
+                            Rank: ${getRank(finishTime)}
+                        `);
+                        window.location.reload();
+                    }
+
+                }
+            })
 
             const ambient = new AmbientLight(0xffffff, 0.2);
             scene.add(ambient);
 
-
             const randomPoints = [];
 
-            for (let i = 0; i < 1000; i++) {
-                randomPoints.push(new Vector3((Math.random() - 0.5) * 1500, 40, Math.random() * -500000));
+            for (let i = 0; i < 20; i++) {
+                randomPoints.push(new Vector3(2000 + (Math.random() * 25000), (Math.random() * 400), (Math.random() - 0.5) * 3000));
             }
 
             const fruits = randomPoints.map(pt => createSpeedFruit(pt, changeSpeed, (group: Group) => {

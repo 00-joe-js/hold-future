@@ -13,7 +13,7 @@ class ItemPickupManager {
     private collidingArea: Sphere;
     private pickupableItems: RegisteredItem[] = [];
 
-    constructor(playerObj: Object3D, collisionDistance = 70) {
+    constructor(playerObj: Object3D, collisionDistance = 150) {
         this.collisionDistance = collisionDistance;
         this.playerObj = playerObj;
         this.collidingArea = new Sphere(playerObj.position, this.collisionDistance);

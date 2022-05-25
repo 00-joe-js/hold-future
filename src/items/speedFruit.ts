@@ -1,5 +1,7 @@
 import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial } from "three";
 
+import { flashGreen } from "../renderer/index";
+
 interface Item {
     obj: Group,
     collidingObj: Mesh,
@@ -18,22 +20,29 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
 
     const light = new PointLight(COLOR, 2);
 
+    light.position.y = -500;
+
     group.add(cylinder);
     group.add(light);
 
     group.position.copy(pos);
 
+    let rewarded = false;
+
     return {
         obj: group,
         collidingObj: cylinder,
-        onLoop: (dt: number) => {
+        onLoop: () => {
             cylinder.rotateOnAxis(new Vector3(1, 0, 0), 0.01);
             cylinder.rotateOnAxis(new Vector3(0, 1, 0), 0.07);
         },
         onPlayerCollide: () => {
-            console.warn("Increasing speed! Goodbye.");
-            increaseSpeed(0.1);
-            pleaseDestroy(group);
+            if (!rewarded) {
+                rewarded = true;
+                increaseSpeed(0.5);
+                flashGreen();
+                pleaseDestroy(group);
+            }
         }
     };
 

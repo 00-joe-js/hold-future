@@ -27,7 +27,7 @@ canvasElement.addEventListener("click", () => {
 const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     const gamepad = new GamepadInterface();
-    // await gamepad.waitForGamepadConnect();
+    await gamepad.waitForGamepadConnect();
 
     const keyboard = new Keyboard();
     const mouse = new MouseInterface();
@@ -173,7 +173,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         scene.add(newLine);
         lines.push(newLine);
 
-        if (lines.length > 7) {
+        if (lines.length > 12) {
             scene.remove(lines[0]);
             lines = lines.slice(1);
         }
@@ -350,10 +350,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
         if (gamepadState) {
             if (gamepadState.moveVel.y !== 0) {
-                moveForward(speed * gamepadState.moveVel.y, movementVector);
+                const y = MathUtils.clamp(gamepadState.moveVel.y, -1, 1);
+                moveForward(speed * y, movementVector);
             }
             if (gamepadState.moveVel.x !== 0) {
-                moveRight(speed * gamepadState.moveVel.x, movementVector);
+                moveRight(speed * 0.7 * gamepadState.moveVel.x, movementVector);
             }
         } else {
             if (keyboard.wDown) {
@@ -363,10 +364,10 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
                 moveForward(-speed, movementVector);
             }
             if (keyboard.aDown) {
-                moveRight(-speed, movementVector);
+                moveRight(-speed * 0.7, movementVector);
             }
             if (keyboard.dDown) {
-                moveRight(speed, movementVector);
+                moveRight(speed * 0.7, movementVector);
             }
         }
 
