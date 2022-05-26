@@ -5,6 +5,9 @@ import { Mesh, UniformsUtils, ShaderLib, BufferAttribute, SphereBufferGeometry }
 
 import customPhongVertex from "./shading/customPhongVertex";
 
+import { flashTeal } from "./renderer/index";
+
+
 import loadModels from "./importHelpers/gltfLoader";
 
 /* GLOBALS */
@@ -32,11 +35,11 @@ import setupFPSCharacter from "./firstPersonCharacter";
 const RESOLUTION = 16 / 9;
 
 import Player from "./firstPersonCharacter/PlayerClass";
-import { RegisteredItem } from "./firstPersonCharacter/itemPickup";
 import createSkybox from "./level/skybox";
 import globalTime from "./subscribe-to-global-render-loop";
 import createGround from "./level/groundPath";
 import createSpeedFruit, { Item } from "./items/speedFruit";
+import GameTimer from "./gameTimer";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
@@ -110,9 +113,37 @@ let loopHooks: Array<(dt: number) => void> = [];
 
         if (sceneMade === false) {
 
+            const hudTimerEle = document.querySelector<HTMLElement>("#hud-time");
+            if (!hudTimerEle) throw new Error("No #hud-time");
+
+            const hudDistanceToGoal = document.querySelector<HTMLElement>("#hud-goal-distance");
+            if (!hudDistanceToGoal) throw new Error("No #hud-goal-distance");
+
+            const timer = new GameTimer(dt, 60);
+            let lost = false;
+
+            loopHooks.push(dt => {
+                timer.updateCurrentTime(dt);
+                const timeLeft = timer.getTimeLeft();
+                if (timeLeft <= 0) {
+                    if (!lost) {
+                        lost = true;
+                        alert("Out of time.");
+                        window.location.reload();
+                    }
+                }
+                hudTimerEle.innerText = timer.getTimeLeft().toPrecision(4);
+            });
+
+            loopHooks.push(dt => {
+                if (Math.random() > .9) {
+                    hudDistanceToGoal.innerText = Math.floor(distanceToGoal(player.camera.position)).toLocaleString("en-US") + "m";
+                }
+            });
+
             scene.add(skybox);
 
-            const { ground, goal, phongGround, setTrackLength } = createGround();
+            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround();
             scene.add(phongGround);
             scene.add(ground);
             scene.add(goal);
@@ -124,17 +155,34 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             const player = new Player(camera);
 
+            const times = [25, 20, 10, 5, 1];
+
+            let onLastGoal = false;
+            let won = false;
+
             registerCollidingItem({
                 obj: goal,
                 whenInRange: () => {
-                    // freezePlayer(true);
-                    const newTrackLength = 100000 + (Math.floor(Math.random() * 100000));
+
+                    if (won) return;
+
+                    if (onLastGoal) {
+                        won = true;
+                        alert("You win!");
+                        window.location.reload();
+                    }
+
+                    const newTrackLength = 100000 + (Math.floor(Math.random() * 10000));
                     resetLevel(scene, player, newTrackLength);
                     setTrackLength(newTrackLength);
-                    setTimeout(() => {
-                        freezePlayer(false);
-                    }, 5000);
-
+                    if (times.length > 0) {
+                        const newTime = times.shift();
+                        newTime && timer.grantMoreTime(newTime);
+                        flashTeal();
+                    } else {
+                        setGoalBrightness(0.8);
+                        onLastGoal = true;
+                    }
                 }
             });
             resetLevel(scene, player, 100000);

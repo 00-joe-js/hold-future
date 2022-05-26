@@ -104,13 +104,6 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         }
     };
 
-    const checkCancelSprinting = (frameMovement: Vector3) => {
-        return
-        if (frameMovement.multiply(new Vector3(1, 0, 1)).equals(ZERO_VEC3)) {
-            sprinting = false;
-        }
-    };
-
     const applyCameraRotation = ({ xVelocity, yVelocity }: { xVelocity: number, yVelocity: number }, copyToEuler: Euler) => {
         if (xVelocity !== 0 || yVelocity !== 0) {
 
@@ -156,29 +149,6 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
     };
 
 
-    const material = new LineBasicMaterial();
-    let lines: Line[] = [];
-    const drawCrosshair = () => {
-        const forward = getPointAheadOfCamera();
-
-        const points = [];
-        points.push(camera.position);
-        points.push(forward);
-        points.push(forward.clone().add(camera.up));
-
-        const geometry = new BufferGeometry().setFromPoints(points);
-        const newLine = new Line(geometry, material);
-
-        newLine.material.color = HYPER_BLUE;
-        scene.add(newLine);
-        lines.push(newLine);
-
-        if (lines.length > 5) {
-            scene.remove(lines[0]);
-            lines = lines.slice(1);
-        }
-    };
-
     const checkIsGrounded = (origin: Vector3 = camera.position) => {
 
         if (aerialVector.y > 0) {
@@ -192,8 +162,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         if (solidSurfacesBelow.length === 0) return { grounded: false, slipping: false, solidSurfacesBelow: [] };
 
         if (solidSurfacesBelow[0].distance <= PLAYER_HEIGHT + 1) {
-            const slipping = onSlipperySurface(solidSurfacesBelow);
-            return { grounded: true, slipping, solidSurfacesBelow };
+            return { grounded: true, slipping: false, solidSurfacesBelow };
         } else {
             return { grounded: false, slipping: false, solidSurfacesBelow };
         }
@@ -284,7 +253,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         }
     };
 
-    const applyJumpAndGravity = (isGrounded: boolean, isSlipping: boolean, deltaTimeSinceSceneStart: number, jumpButtonDown: boolean) => {
+    const applyJumpAndGravity = (isGrounded: boolean, deltaTimeSinceSceneStart: number, jumpButtonDown: boolean) => {
         if (isGrounded) {
 
             lastFallingFrameTime = 0;
@@ -292,12 +261,10 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
                 aerialVector.set(0, 0, 0);
             }
 
-            if (!isSlipping) {
-                let spaceDown = getSpacePress(jumpButtonDown);
-                if (spaceDown) {
-                    aerialVector.add(new Vector3(0, JUMP_FORCE, 0));
-                    fall(deltaTimeSinceSceneStart);
-                }
+            let spaceDown = getSpacePress(jumpButtonDown);
+            if (spaceDown) {
+                aerialVector.add(new Vector3(0, JUMP_FORCE, 0));
+                fall(deltaTimeSinceSceneStart);
             }
 
         } else {
@@ -325,26 +292,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const movementVector = new Vector3(0, 0, 0);
 
         const initialGroundedCheck = checkIsGrounded();
-        const isSlipping = initialGroundedCheck.slipping;
-        const isGrounded = initialGroundedCheck.grounded;
-        applyJumpAndGravity(isGrounded, initialGroundedCheck.slipping, dt, gamepadState ? gamepadState.xDown : keyboard.spaceDown);
-        assignSprinting(isGrounded, gamepadState ? gamepadState.zRDown : keyboard.ctrlDown);
 
-        if (isSlipping) {
-            const closestSurface = initialGroundedCheck.solidSurfacesBelow[0];
-            const face = closestSurface.face;
-            if (!face) {
-                const err = new Error("No face. Why?");
-                throw err;
-            }
-            const normal = convertLocalNormalToWorld(closestSurface.object, face.normal);
-            const slideVector = getSlippingVectorFromSurfaceNormal(normal);
-            camera.position.add(slideVector.multiplyScalar(3));
-            preventMovement = true;
-            setTimeout(() => {
-                preventMovement = false;
-            }, 500);
-        }
+        const isGrounded = initialGroundedCheck.grounded;
+
+        applyJumpAndGravity(isGrounded, dt, gamepadState ? gamepadState.xDown : keyboard.spaceDown);
+        assignSprinting(isGrounded, gamepadState ? gamepadState.zRDown : keyboard.ctrlDown);
 
         // let speed = SPEED * (sprinting && !isSlipping ? 5 : 1);
         let speed = SPEED * 5;
@@ -395,26 +347,18 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             }
         }
 
-        if (gamepadState) {
-            // applyCameraRotation({ xVelocity: gamepadState.lookVel.x, yVelocity: gamepadState.lookVel.y }, _euler);
-        } else {
-            applyCameraRotation({ xVelocity: mouse.movement.x, yVelocity: mouse.movement.y }, _euler);
-        }
+        // if (gamepadState) {
+        //     applyCameraRotation({ xVelocity: gamepadState.lookVel.x, yVelocity: gamepadState.lookVel.y }, _euler);
+        // } else {
+        //     applyCameraRotation({ xVelocity: mouse.movement.x, yVelocity: mouse.movement.y }, _euler);
+        // }
 
         const finalGrounded = checkIsGrounded(camera.position);
 
         if (finalGrounded.grounded) {
+            // Lifts the camera away from solid surface beneath.
             applyHeadBob(movementVector);
         }
-
-        if (finalGrounded.grounded) {
-            // Lifts the camera away from solid surface beneath.
-            graduallyMaintainHeight(finalGrounded.solidSurfacesBelow[0].distance);
-        }
-
-        // Cancels sprinting if not moving.
-        // checkCancelSprinting(movementVector);
-        // drawCrosshair();
 
         itemPickupManager.testAndTriggerListeners();
 

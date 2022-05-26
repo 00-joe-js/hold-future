@@ -1,10 +1,11 @@
-import { Mesh, BoxGeometry, ShaderMaterial, PlaneGeometry, MeshBasicMaterial, MeshPhongMaterial, TextureLoader } from "three";
+import { Mesh, BoxGeometry, ShaderMaterial, PlaneGeometry, MeshBasicMaterial, MeshPhongMaterial, TextureLoader, Vector3 } from "three";
 import { vertexShader, fragmentShader } from "./groundShaders";
 import { vertexShader as goalVShader, fragmentShader as goalFShader } from "./goalShaders";
 
 import globalTime from "../../subscribe-to-global-render-loop";
 
 import noiseTex from "../../../assets/noisetextures/explosion.png";
+import Player from "../../firstPersonCharacter/PlayerClass";
 
 export default () => {
 
@@ -41,7 +42,12 @@ export default () => {
 
     const goalU = {
         u_time: { value: 0 },
-        u_tex: { value: new TextureLoader().load(noiseTex) }
+        u_tex: { value: new TextureLoader().load(noiseTex) },
+        u_brightness: { value: 0.4 }
+    };
+
+    const setGoalBrightness = (v: number) => {
+        goalU.u_brightness.value = v;
     };
 
     const goalMat = new ShaderMaterial({
@@ -55,7 +61,6 @@ export default () => {
 
     goal.rotation.y = -Math.PI / 2;
     goal.position.x = trackLength - 1000;
-
 
     globalTime.subscribe((dt: number) => {
         u.uTime.value = dt;
@@ -77,6 +82,11 @@ export default () => {
 
     setTrackLength(trackLength);
 
-    return { ground, phongGround, goal, setTrackLength };
+    const distanceToGoal = (pt: Vector3) => {
+        // Length of track is x-axis.
+        return goal.position.x - pt.x;
+    };
+
+    return { ground, phongGround, goal, setTrackLength, distanceToGoal, setGoalBrightness };
 
 };

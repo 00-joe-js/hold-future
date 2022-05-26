@@ -65,6 +65,8 @@ const copyPass = new ShaderPass(CopyShader);
 let currentGreenFlash: number | undefined = undefined;
 export const flashGreen = () => {
 
+    if (flashTealInterval) return;
+
     if (currentGreenFlash) {
         clearInterval(currentGreenFlash);
     }
@@ -79,6 +81,24 @@ export const flashGreen = () => {
     }, 16);
 
 };
+
+let flashTealInterval: number | null = null;
+export const flashTeal = () => {
+
+    let flashLevel = 0.2;
+    flashTealInterval = setInterval(() => {
+        colorifyPass.uniforms.color.value.setRGB(0, flashLevel, flashLevel);
+        flashLevel = flashLevel - 0.001;
+        if (flashLevel <= 0) {
+            if (flashTealInterval) {
+                clearInterval(flashTealInterval);
+                flashTealInterval = null;
+            }
+        }
+    }, 16);
+
+};
+
 
 export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) => void) => {
 
