@@ -21,6 +21,9 @@ class ItemPickupManager {
 
     registerPickupableItem(item: RegisteredItem) {
         this.pickupableItems.push(item);
+        return () => {
+            this.pickupableItems = this.pickupableItems.filter(i => i === item);
+        };
     }
 
     testAndTriggerListeners() {

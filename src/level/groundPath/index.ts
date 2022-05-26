@@ -18,11 +18,18 @@ export default () => {
 
     const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 10000, specular: 0xffffff });
 
-    const trackLength = 80000;
+    const trackLength = 100000;
     const trackWidth = 3000;
 
-    const groundG = new BoxGeometry(trackLength, 0, trackWidth, 30, 1, 30);
-    const groundP = new BoxGeometry(trackLength, 0, trackWidth, 1, 1, 1);
+    const createGroundGeos = (len = trackLength) => {
+        return [
+            new BoxGeometry(len, 0, trackWidth, 200, 1, 10),
+            new BoxGeometry(len, 0, trackWidth, 1, 1, 1)
+        ];
+    };
+
+    let [groundG, groundP] = createGroundGeos();
+
     const ground = new Mesh(groundG, groundMat);
     const phongGround = new Mesh(groundP, altGroundMat);
 
@@ -30,9 +37,7 @@ export default () => {
     ground.layers.enable(7);
 
     phongGround.position.y = -35;
-    phongGround.position.x = trackLength / 2;
     ground.position.y = -5;
-    ground.position.x = trackLength / 2;
 
     const goalU = {
         u_time: { value: 0 },
@@ -57,6 +62,21 @@ export default () => {
         goalU.u_time.value = dt;
     });
 
-    return { ground, phongGround, goal };
+    const setTrackLength = (len: number) => {
+        groundG.dispose();
+        groundP.dispose();
+        [groundG, groundP] = createGroundGeos(len);
+        ground.geometry = groundG;
+        phongGround.geometry = groundP;
+
+        ground.position.x = len / 2;
+        phongGround.position.x = len / 2;
+
+        goal.position.x = len - 1000;
+    };
+
+    setTrackLength(trackLength);
+
+    return { ground, phongGround, goal, setTrackLength };
 
 };

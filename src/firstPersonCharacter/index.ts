@@ -83,7 +83,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
     };
 
 
-    let sprinting = false;
+    let sprinting = true;
     let headBobDelta = 0;
 
     // To be called in loop:
@@ -105,6 +105,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
     };
 
     const checkCancelSprinting = (frameMovement: Vector3) => {
+        return
         if (frameMovement.multiply(new Vector3(1, 0, 1)).equals(ZERO_VEC3)) {
             sprinting = false;
         }
@@ -168,15 +169,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const geometry = new BufferGeometry().setFromPoints(points);
         const newLine = new Line(geometry, material);
 
-        if (sprinting) {
-            newLine.material.color = POWERED_PINKRED;
-        } else {
-            newLine.material.color = HYPER_BLUE;
-        }
+        newLine.material.color = HYPER_BLUE;
         scene.add(newLine);
         lines.push(newLine);
 
-        if (lines.length > 12) {
+        if (lines.length > 5) {
             scene.remove(lines[0]);
             lines = lines.slice(1);
         }
@@ -349,7 +346,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             }, 500);
         }
 
-        let speed = SPEED * (sprinting && !isSlipping ? 5 : 1);
+        // let speed = SPEED * (sprinting && !isSlipping ? 5 : 1);
+        let speed = SPEED * 5;
+        speed += calculateSpeedBonuses(dt);
 
         if (gamepadState) {
             if (gamepadState.moveVel.y !== 0) {
@@ -414,11 +413,37 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         }
 
         // Cancels sprinting if not moving.
-        checkCancelSprinting(movementVector);
-        drawCrosshair();
+        // checkCancelSprinting(movementVector);
+        // drawCrosshair();
 
         itemPickupManager.testAndTriggerListeners();
 
+    };
+
+    interface Bonus {
+        totalBonus: number, decayOverMs: number, initialDt: number
+    }
+    let speedBonuses: Bonus[] = [];
+    const calculateSpeedBonuses = (currentDt: number): number => {
+        let newSpeedBonuses: Bonus[] = [];
+        const addedSpeed = speedBonuses.reduce((totalSpeedBonus, thisBonus) => {
+
+            const { initialDt, decayOverMs, totalBonus } = thisBonus;
+
+            if (initialDt + decayOverMs < currentDt) {
+                return totalSpeedBonus;
+            }
+
+            newSpeedBonuses.push(thisBonus);
+            const timeRemaining = currentDt - initialDt;
+            totalSpeedBonus += totalBonus * (1 - (timeRemaining / decayOverMs));
+
+            return totalSpeedBonus;
+        }, 0);
+
+        speedBonuses = newSpeedBonuses;
+
+        return addedSpeed;
     };
 
     return {
@@ -426,8 +451,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         registerCollidingItem(item: RegisteredItem) {
             itemPickupManager.registerPickupableItem(item);
         },
-        getSpeed() {
-            return SPEED;
+        grantDecayingSpeedBonus(totalBonus: number, decayOverMs: number, initialDt: number) {
+            speedBonuses.push({ totalBonus, decayOverMs, initialDt });
+        },
+        getSpeed(dt: number) {
+            return SPEED + calculateSpeedBonuses(dt);
         },
         changeSpeed(d: number) {
             SPEED += d;
@@ -435,6 +463,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         },
         setSpeed(v: number) {
             SPEED = v;
+        },
+        freezePlayer(freeze: boolean) {
+            preventMovement = freeze;
         }
     };
 

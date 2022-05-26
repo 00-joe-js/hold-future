@@ -58,7 +58,7 @@ const ColorifyShader = {
 };
 
 const screenRes = new Vector2(canvasElement.clientWidth, canvasElement.clientHeight);
-const bloomPass = new UnrealBloomPass(screenRes, 0.5, 0, 0.5);
+const bloomPass = new UnrealBloomPass(screenRes, 0.8, 0, 0.5);
 const colorifyPass = new ShaderPass(ColorifyShader);
 const copyPass = new ShaderPass(CopyShader);
 
@@ -69,10 +69,10 @@ export const flashGreen = () => {
         clearInterval(currentGreenFlash);
     }
 
-    let flashLevel = 0.02;
+    let flashLevel = 0.1;
     currentGreenFlash = setInterval(() => {
         colorifyPass.uniforms.color.value.setRGB(0, flashLevel, 0);
-        flashLevel = flashLevel - 0.001;
+        flashLevel = flashLevel - 0.005;
         if (flashLevel <= 0) {
             clearInterval(currentGreenFlash);
         }
@@ -94,9 +94,6 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
     const internalLoop = (deltaTime: number) => {
         window.requestAnimationFrame(internalLoop);
         onLoop(deltaTime);
-
-        // colorifyPass.uniforms.color.value.setRGB(0, Math.random(), 0);
-
         composer.render(deltaTime);
     };
     window.requestAnimationFrame(internalLoop);

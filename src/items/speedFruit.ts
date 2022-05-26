@@ -2,7 +2,7 @@ import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial }
 
 import { flashGreen } from "../renderer/index";
 
-interface Item {
+export interface Item {
     obj: Group,
     collidingObj: Mesh,
     onLoop: (dt: number) => void,

@@ -12,6 +12,10 @@ class Player {
         this.camera.position.copy(pos);
     }
 
+    faceForward() {
+        this.camera.rotation.y = -Math.PI / 2;
+    }
+
 }
 
 export default Player;

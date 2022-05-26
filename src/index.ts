@@ -1,6 +1,6 @@
 import "./style.css";
 
-import { Scene, PerspectiveCamera, AmbientLight, DirectionalLight, MeshPhongMaterial, BoxGeometry, Color, MathUtils, ShaderMaterial, Vector3, Euler, Group } from "three";
+import { Scene, PerspectiveCamera, AmbientLight, DirectionalLight, MeshPhongMaterial, BoxGeometry, Color, MathUtils, ShaderMaterial, Vector3, Euler, Group, _SRGBAFormat } from "three";
 import { Mesh, UniformsUtils, ShaderLib, BufferAttribute, SphereBufferGeometry } from "three";
 
 import customPhongVertex from "./shading/customPhongVertex";
@@ -36,87 +36,10 @@ import { RegisteredItem } from "./firstPersonCharacter/itemPickup";
 import createSkybox from "./level/skybox";
 import globalTime from "./subscribe-to-global-render-loop";
 import createGround from "./level/groundPath";
-import createSpeedFruit from "./items/speedFruit";
+import createSpeedFruit, { Item } from "./items/speedFruit";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
-
-
-// randos.
-const randomColor = () => {
-    const rChannel = () => MathUtils.randFloat(0, 1);
-    const color = new Color(rChannel(), rChannel(), rChannel());
-    return color;
-};
-
-const createRandos = (registerCollide: (item: RegisteredItem) => void) => {
-    const AMOUNT = 20;
-    const DISTANCE = 1.0;
-
-    const gameLoopFns = [];
-
-    for (let i = 0; i < AMOUNT; i++) {
-        const sphereG = new SphereBufferGeometry(MathUtils.randFloat(5.0, 8.5), MathUtils.randInt(7, 15), MathUtils.randInt(10, 20));
-
-        let offsets = new Float32Array();
-        for (let i = 0; i < sphereG.attributes.position.count; i++) {
-            offsets[i] = Math.random();
-        }
-
-        sphereG.setAttribute('offset', new BufferAttribute(offsets, 1));
-
-        const tryMaterial = "phong";
-
-        const combinedUniforms = UniformsUtils.merge([
-            ShaderLib[tryMaterial].uniforms,
-            { specular: { value: randomColor() } },
-            { shininess: { value: 2000.0 } },
-            { diffuse: { value: randomColor() } },
-            { time: { value: 0.0 } },
-        ]);
-
-        const customMaterial = new ShaderMaterial({
-            uniforms: combinedUniforms,
-            vertexShader: customPhongVertex,
-            fragmentShader: ShaderLib[tryMaterial].fragmentShader,
-            lights: true,
-        });
-
-        const sphere = new Mesh(sphereG, customMaterial);
-
-        sphere.position.y = .5;
-        sphere.rotation.y = Math.random() * PI;
-
-        const orbitRadius = (i - 5) * -DISTANCE;
-        sphere.position.x = orbitRadius * Math.cos(MathUtils.randFloat(0, PI2));
-        sphere.position.z = orbitRadius * Math.sin(MathUtils.randFloat(0, PI2));
-
-        scene.add(sphere);
-
-        registerCollide({
-            obj: sphere,
-            whenInRange: () => {
-                scene.remove(sphere);
-            }
-        });
-
-        const initialY = sphere.position.y;
-        const offset = MathUtils.randInt(0, 5000);
-        const xOffset = MathUtils.randInt(-300, 300);
-        const extra = MathUtils.randInt(25, 50);
-        const normSin = (sin: number) => (sin + 1) / 2;
-        gameLoopFns.push((dt: number) => {
-            sphere.position.y = initialY + normSin(Math.sin((offset + dt) / 500));
-            sphere.position.x = ((Math.sin((dt + offset) / (offset + 1000))) * extra) + xOffset;
-            sphere.position.z += (Math.cos((dt + offset) / 2000));
-            combinedUniforms.time.value = dt;
-        });
-    }
-
-    return gameLoopFns;
-
-
-};
 
 let sceneMade = false;
 
@@ -127,7 +50,7 @@ let loopHooks: Array<(dt: number) => void> = [];
     const skybox = await createSkybox();
     const models = await loadModels();
 
-    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed } = await setupFPSCharacter(camera, scene);
+    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed, setSpeed, grantDecayingSpeedBonus, freezePlayer } = await setupFPSCharacter(camera, scene);
 
     loopHooks.push(gameLoopFn);
 
@@ -137,85 +60,84 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     const speedInterface = document.querySelector<HTMLElement>("#speed");
     if (!speedInterface) throw new Error("Speed interface?");
-    loopHooks.push(() => {
-        speedInterface.innerText = getSpeed().toFixed(1);
+    loopHooks.push((dt) => {
+        if (Math.random() > .5) {
+            speedInterface.innerText = getSpeed(dt).toFixed(2);
+        }
     });
 
-    renderLoop(scene, camera, (dt) => {
+    let items: Item[] = [];
+    const resetLevel = (scene: Scene, player: Player, trackLength: number) => {
 
-        if (sceneMade === false) {
+        if (items.length > 0) {
+            items.forEach(f => scene.remove(f.obj));
+        }
 
-            const player = new Player(camera);
-            player.setWorldPosition(new Vector3(0, 210, 0));
-            camera.rotation.y = -Math.PI / 2;
+        const randomPoints = [];
+        for (let i = 0; i < 40; i++) {
+            randomPoints.push(new Vector3(1000 + (Math.random() * (trackLength - 5000)), (Math.random() > .5 ? 400 : 100), (Math.random() - 0.5) * 2500));
+        }
 
-            sceneMade = true;
+        items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {
+            grantDecayingSpeedBonus(moreSpeed * 20, 2000, globalTime.getTime());
+            changeSpeed(moreSpeed / 8);
+        }, (group: Group) => {
+            requestAnimationFrame(() => {
+                scene.remove(group);
+            });
+        }));
 
-            scene.add(skybox);
-
-            const { ground, goal, phongGround } = createGround();
-
-            scene.add(phongGround);
-            scene.add(ground);
-            scene.add(goal);
-
-            const start = Date.now();
-            let once = false;
-            registerCollidingItem({
-                obj: goal,
-                whenInRange: () => {
-                    if (!once) {
-                        const finishTime = Date.now() - start;
-                        once = true;
-                        const getRank = (time: number) => {
-                            time = time / 1000;
-                            if (time > 24) {
-                                return "Kinda Slow";
-                            } else if (time > 21) {
-                                return "Pretty Good";
-                            } else if (time > 17) {
-                                return "Nice and Speedy";
-                            } else {
-                                return "Damn Fast";
-                            }
-                        };
-                        alert(`
-                            You reached the goal.
-                            Max speed: ${getSpeed().toFixed(1)}
-                            Time to goal: ${(finishTime / 1000).toFixed(1)} seconds (${finishTime}ms)
-                            Rank: ${getRank(finishTime)}
-                        `);
-                        window.location.reload();
-                    }
-
-                }
-            })
-
-            const ambient = new AmbientLight(0xffffff, 0.2);
-            scene.add(ambient);
-
-            const randomPoints = [];
-
-            for (let i = 0; i < 70; i++) {
-                randomPoints.push(new Vector3(2000 + (Math.random() * 75000), (Math.random() * 700), (Math.random() - 0.5) * 3000));
-            }
-
-            const fruits = randomPoints.map(pt => createSpeedFruit(pt, changeSpeed, (group: Group) => {
-                requestAnimationFrame(() => {
-                    scene.remove(group);
-                });
-            }));
-
-            fruits.forEach(f => {
-                scene.add(f.obj)
-                loopHooks.push(f.onLoop);
+        items.forEach(f => {
+            scene.add(f.obj)
+            loopHooks.push(f.onLoop);
+            setTimeout(() => {
                 registerCollidingItem({
                     obj: f.collidingObj,
                     whenInRange: () => {
                         f.onPlayerCollide();
                     }
                 });
+            }, 100);
+
+        });
+
+        player.setWorldPosition(new Vector3(0, 100, 0));
+        player.faceForward();
+    };
+
+
+    renderLoop(scene, camera, (dt) => {
+
+        if (sceneMade === false) {
+
+            scene.add(skybox);
+
+            const { ground, goal, phongGround, setTrackLength } = createGround();
+            scene.add(phongGround);
+            scene.add(ground);
+            scene.add(goal);
+
+            const ambient = new AmbientLight(0xffffff, 0.2);
+            scene.add(ambient);
+
+            sceneMade = true;
+
+            const player = new Player(camera);
+
+            registerCollidingItem({
+                obj: goal,
+                whenInRange: () => {
+                    // freezePlayer(true);
+                    const newTrackLength = 100000 + (Math.floor(Math.random() * 100000));
+                    resetLevel(scene, player, newTrackLength);
+                    setTrackLength(newTrackLength);
+                    setTimeout(() => {
+                        freezePlayer(false);
+                    }, 5000);
+
+                }
             });
+            resetLevel(scene, player, 100000);
 
         }
 
