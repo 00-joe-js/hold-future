@@ -87,6 +87,8 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     // To be called in loop:
     const assignSprinting = (isGrounded: boolean, sprintButtonDown: boolean) => {
+        sprinting = true;
+        return;
         if (sprinting === true) return sprinting;
 
         if (sprintButtonDown === true) {
