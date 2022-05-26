@@ -58,7 +58,7 @@ const ColorifyShader = {
 };
 
 const screenRes = new Vector2(canvasElement.clientWidth, canvasElement.clientHeight);
-const bloomPass = new UnrealBloomPass(screenRes, 1.0, 0, 0.5);
+const bloomPass = new UnrealBloomPass(screenRes, 0.5, 0, 0.5);
 const colorifyPass = new ShaderPass(ColorifyShader);
 const copyPass = new ShaderPass(CopyShader);
 
@@ -69,7 +69,7 @@ export const flashGreen = () => {
         clearInterval(currentGreenFlash);
     }
 
-    let flashLevel = 0.1;
+    let flashLevel = 0.02;
     currentGreenFlash = setInterval(() => {
         colorifyPass.uniforms.color.value.setRGB(0, flashLevel, 0);
         flashLevel = flashLevel - 0.001;
