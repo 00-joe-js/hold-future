@@ -74,8 +74,8 @@ let loopHooks: Array<(dt: number) => void> = [];
         }
 
         const randomPoints = [];
-        for (let i = 0; i < 40; i++) {
-            randomPoints.push(new Vector3(1000 + (Math.random() * (trackLength - 5000)), (Math.random() > .5 ? 400 : 100), (Math.random() - 0.5) * 2500));
+        for (let i = 0; i < 50; i++) {
+            randomPoints.push(new Vector3(1000 + (Math.random() * (trackLength - 5000)), (Math.random() > .5 ? 400 : 100), (Math.random() - 0.5) * 4000));
         }
 
         items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {

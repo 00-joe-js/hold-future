@@ -19,7 +19,7 @@ export default () => {
     const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 10000, specular: 0xffffff });
 
     const trackLength = 100000;
-    const trackWidth = 3000;
+    const trackWidth = 5000;
 
     const createGroundGeos = (len = trackLength) => {
         return [
@@ -50,7 +50,7 @@ export default () => {
         fragmentShader: goalFShader
     });
 
-    const goalG = new PlaneGeometry(trackWidth, 10000);
+    const goalG = new PlaneGeometry(trackWidth, 20000);
     const goal = new Mesh(goalG, goalMat);
 
     goal.rotation.y = -Math.PI / 2;
