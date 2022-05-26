@@ -396,7 +396,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         }
 
         if (gamepadState) {
-            applyCameraRotation({ xVelocity: gamepadState.lookVel.x, yVelocity: gamepadState.lookVel.y }, _euler);
+            // applyCameraRotation({ xVelocity: gamepadState.lookVel.x, yVelocity: gamepadState.lookVel.y }, _euler);
         } else {
             applyCameraRotation({ xVelocity: mouse.movement.x, yVelocity: mouse.movement.y }, _euler);
         }
