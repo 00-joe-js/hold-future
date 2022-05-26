@@ -26,9 +26,9 @@ float n(float v) {
 
 void main (void)
 {
-  float r = (u_time / 2000.0);
+  float r = (u_time / 500.0);
   vec2 uv = vUv + vec2(n(sin(r)), n(cos(r)));
-  vec3 color = texture2D(u_tex, uv).rgb;
-  gl_FragColor = vec4(color * 1.0, 1.0);
+  vec3 color = texture2D(u_tex, uv).rbg;
+  gl_FragColor = vec4(color * 0.4, 1.0);
 }
 `;

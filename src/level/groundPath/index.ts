@@ -16,16 +16,21 @@ export default () => {
         fragmentShader
     });
 
-    const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 1000 });
+    const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 10000, specular: 0xffffff });
 
-    const trackLength = 40000;
+    const trackLength = 80000;
     const trackWidth = 3000;
 
-    const groundG = new BoxGeometry(trackLength, 0, trackWidth, 20, 1, 10);
+    const groundG = new BoxGeometry(trackLength, 0, trackWidth, 30, 1, 30);
+    const groundP = new BoxGeometry(trackLength, 0, trackWidth, 1, 1, 1);
     const ground = new Mesh(groundG, groundMat);
+    const phongGround = new Mesh(groundP, altGroundMat);
 
     ground.name = "ground";
     ground.layers.enable(7);
+
+    phongGround.position.y = -35;
+    phongGround.position.x = trackLength / 2;
     ground.position.y = -5;
     ground.position.x = trackLength / 2;
 
@@ -52,6 +57,6 @@ export default () => {
         goalU.u_time.value = dt;
     });
 
-    return { ground, goal };
+    return { ground, phongGround, goal };
 
 };

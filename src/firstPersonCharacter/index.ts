@@ -11,7 +11,8 @@ const MIN_POLAR_ANGLE = -MAX_POLAR_ANGLE;
 const SOLID_LAYER = 7;
 const CAN_SPRINT_IN_AIR = true;
 const PLAYER_HEIGHT = 60;
-const JUMP_FORCE = 1.2;
+const JUMP_FORCE = 15;
+const GRAVITY_MULT = 0.075;
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3(0, 0, 0);
@@ -267,7 +268,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             lastFallingFrameTime = deltaTimeSinceSceneStart;
         }
 
-        aerialVector.add(new Vector3(0, -((thisFallTotalTime / 1000) * 9.8) * 0.003, 0));
+        aerialVector.add(new Vector3(0, -((thisFallTotalTime / 1000) * 9.8) * GRAVITY_MULT, 0));
 
         camera.position.add(aerialVector);
 
@@ -297,7 +298,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             if (!isSlipping) {
                 let spaceDown = getSpacePress(jumpButtonDown);
                 if (spaceDown) {
-                    aerialVector.add(new Vector3(0, JUMP_FORCE * (sprinting ? 3 : 1), 0));
+                    aerialVector.add(new Vector3(0, JUMP_FORCE, 0));
                     fall(deltaTimeSinceSceneStart);
                 }
             }

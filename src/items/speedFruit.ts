@@ -18,13 +18,12 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
     const cylinderGeo = new CylinderGeometry(20, 20, 80);
     const cylinder = new Mesh(cylinderGeo, new MeshBasicMaterial({ color: COLOR }));
 
-    const light = new PointLight(COLOR, 2);
-
-    light.position.y = -500;
+    // const light = new PointLight(COLOR, 2);
+    // light.position.y = -500;
+    // group.add(light);
 
     group.add(cylinder);
-    group.add(light);
-
+    
     group.position.copy(pos);
 
     let rewarded = false;
@@ -39,7 +38,7 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
         onPlayerCollide: () => {
             if (!rewarded) {
                 rewarded = true;
-                increaseSpeed(0.75);
+                increaseSpeed(1.5);
                 flashGreen();
                 pleaseDestroy(group);
             }

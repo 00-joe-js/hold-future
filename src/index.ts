@@ -153,7 +153,9 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             scene.add(skybox);
 
-            const { ground, goal } = createGround();
+            const { ground, goal, phongGround } = createGround();
+
+            scene.add(phongGround);
             scene.add(ground);
             scene.add(goal);
 
@@ -194,12 +196,14 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             const randomPoints = [];
 
-            for (let i = 0; i < 20; i++) {
-                randomPoints.push(new Vector3(2000 + (Math.random() * 25000), (Math.random() * 400), (Math.random() - 0.5) * 3000));
+            for (let i = 0; i < 70; i++) {
+                randomPoints.push(new Vector3(2000 + (Math.random() * 75000), (Math.random() * 700), (Math.random() - 0.5) * 3000));
             }
 
             const fruits = randomPoints.map(pt => createSpeedFruit(pt, changeSpeed, (group: Group) => {
-                scene.remove(group);
+                requestAnimationFrame(() => {
+                    scene.remove(group);
+                });
             }));
 
             fruits.forEach(f => {

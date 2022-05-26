@@ -19,7 +19,7 @@ export const fragmentShader = `
 uniform float uTime;
 varying vec3 vPos;
 void main() {
-    vec3 color = vec3(0.0 + (abs(vPos.y) / 50.0), sin(vPos.z / 100.0 + (uTime / 200.0)), abs(sin(vPos.y)));
+    vec3 color = vec3((abs(vPos.y) / 20.0), sin(vPos.z / 100.0 + (uTime / 200.0)), abs(sin(vPos.y)));
     gl_FragColor = vec4(color, 1.0);
 }
 `;
