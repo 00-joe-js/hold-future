@@ -26,7 +26,7 @@ varying vec2 vUv;
 void main (void)
 {
   vec3 color = texture2D(u_tex, vUv).rgb;
-  gl_FragColor = vec4(color.rrr, 1.0); 
+  gl_FragColor = vec4(color.rgb * 0.5, 1.0); 
 }
 `;
 
@@ -41,7 +41,7 @@ const createSkybox = async () => {
         });
     });
 
-    const size = 1800000;
+    const size = 1000000000000;
     const boxGeo = new BoxGeometry(size, size, size);
 
     return new Mesh(boxGeo, mats);

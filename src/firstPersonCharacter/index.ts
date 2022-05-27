@@ -120,7 +120,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
     const getPointAheadOfCamera = () => {
         const forward = new Vector3(0, 0, -1);
         forward.applyQuaternion(camera.quaternion);
-        forward.multiplyScalar(60);
+        forward.multiplyScalar(100);
         forward.add(camera.position);
         return forward;
     };
@@ -129,7 +129,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         const aheadOfCameraBeforeReposition = getPointAheadOfCamera();
         const vel = movementVector.clone().multiply(new Vector3(1, 0, 1)).length();
 
-        const getWavePoint = () => Math.abs(Math.sin(headBobDelta / 2.5)) * 0.7;
+        const getWavePoint = () => Math.abs(Math.sin(headBobDelta / 5)) * 0.7;
         const currentWavePoint = getWavePoint();
 
         if (vel > 0) {
@@ -279,10 +279,11 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
     };
 
-    let preventMovement = false;
 
     const itemPickupManager = new ItemPickupManager(camera);
 
+    let preventMovement = false;
+    let trackWallZed = 2500;
 
     // Function to run on game loop.
     const gameLoopFn = (dt: number) => {
@@ -359,6 +360,8 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
             applyHeadBob(movementVector);
         }
 
+        camera.position.z = MathUtils.clamp(camera.position.z, -trackWallZed, trackWallZed);
+
         itemPickupManager.testAndTriggerListeners();
 
     };
@@ -403,6 +406,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         getSpeed(dt: number) {
             return SPEED + calculateSpeedBonuses(dt);
         },
+        getBaseSpeed() {
+            return SPEED;
+        },
         changeSpeed(d: number) {
             SPEED += d;
             return SPEED;
@@ -412,6 +418,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         },
         freezePlayer(freeze: boolean) {
             preventMovement = freeze;
+        },
+        setTrackWallZed(v: number) {
+            trackWallZed = v;
         }
     };
 

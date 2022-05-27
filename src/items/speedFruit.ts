@@ -38,7 +38,7 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
         onPlayerCollide: () => {
             if (!rewarded) {
                 rewarded = true;
-                increaseSpeed(1.5);
+                increaseSpeed(1.25);
                 flashGreen();
                 pleaseDestroy(group);
             }

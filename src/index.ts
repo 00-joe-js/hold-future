@@ -25,28 +25,7 @@ window.HYPER_BLUE = new Color(0xaaffff);
 window.POWERED_PINKRED = new Color(0xffeeee);
 // ---
 
-const TEST_UPGRADES = [
-    {
-        name: "Hello, Neighbor!",
-        description: `Your sphere of influence is stronger. <strong>Pull in speed fruit that are farther away</strong>.`,
-        cost: 10
-    },
-    {
-        name: "The Juice.",
-        description: `<strong>Increase your base speed by 5m/s</strong>. It's not fancy, but it's fast.`,
-        cost: 5
-    },
-    {
-        name: "Project Gravitas",
-        description: `<strong>All speed fruit will be grounded.</strong> Who needs to jump anyway!`,
-        cost: 35
-    },
-    {
-        name: "Extra Juicy!",
-        description: `For those days you really the juice. <strong>Increase your base speed by 20m/s</strong>! Sometimes you gotta splurge.`,
-        cost: 20
-    }
-];
+import TEST_UPGRADES from "./upgrades/upgrades-doc";
 
 function shuffleArray(array: Array<any>) {
     for (var i = array.length - 1; i > 0; i--) {
@@ -76,7 +55,7 @@ import GameTimer from "./gameTimer";
 import upgradesManager from "./upgrades/gui";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
+const camera = new PerspectiveCamera(80, RESOLUTION, 1, 200000000);
 
 let sceneMade = false;
 let paused = false;
@@ -88,9 +67,25 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     const skybox = await createSkybox();
 
+    // UPGRADE VALUES other than SPEED.
+    let START_TRACK_LENGTH = 50000;
+    let trackWidth = 5000;
     let projectGravitasActivated = false;
+    let fruitBoost = 10;
+    let fruitPerTrack = 50;
 
-    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed, setSpeed, grantDecayingSpeedBonus, freezePlayer, increaseColliderSize } = await setupFPSCharacter(camera, scene);
+    const {
+        gameLoopFn,
+        registerCollidingItem,
+        changeSpeed,
+        getSpeed,
+        getBaseSpeed,
+        setSpeed,
+        grantDecayingSpeedBonus,
+        freezePlayer,
+        increaseColliderSize,
+        setTrackWallZed
+    } = await setupFPSCharacter(camera, scene);
 
     loopHooks.push((dt) => {
         if (protectPause) return;
@@ -126,62 +121,18 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     const speedInterface = document.querySelector<HTMLElement>("#speed");
     if (!speedInterface) throw new Error("Speed interface?");
+    const totalSpeed = speedInterface.querySelector<HTMLElement>("#total-speed");
+    const baseSpeed = speedInterface.querySelector<HTMLElement>("span strong");
+    if (!speedInterface || !baseSpeed || !totalSpeed) throw new Error("Speed interface?");
+
 
     loopHooks.push((dt) => {
         if (Math.random() > .5) {
-            speedInterface.innerText = getSpeed(dt).toFixed(2);
+            totalSpeed.innerText = getSpeed(dt).toFixed(2);
+            baseSpeed.innerText = getBaseSpeed().toFixed(0);
         }
     });
 
-    let items: Item[] = [];
-    const resetLevel = (scene: Scene, player: Player, trackLength: number) => {
-
-        if (items.length > 0) {
-            items.forEach(f => scene.remove(f.obj));
-        }
-
-        const randomPoints = [];
-        for (let i = 0; i < 50; i++) {
-            let y = 0;
-            if (projectGravitasActivated) {
-                y = 100;
-            } else {
-                y = (Math.random() > .5 ? 400 : 100);
-            }
-
-            randomPoints.push(new Vector3(
-                Math.random() * (trackLength),
-                y,
-                (Math.random() - 0.5) * 4000
-            ));
-        }
-
-        items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {
-            grantDecayingSpeedBonus(moreSpeed * 20, 2000, globalTime.getTime());
-            changeSpeed(moreSpeed / 8);
-        }, (group: Group) => {
-            requestAnimationFrame(() => {
-                scene.remove(group);
-            });
-        }));
-
-        items.forEach(f => {
-            scene.add(f.obj)
-            loopHooks.push(f.onLoop);
-            setTimeout(() => {
-                registerCollidingItem({
-                    obj: f.collidingObj,
-                    whenInRange: () => {
-                        f.onPlayerCollide();
-                    }
-                });
-            }, 100);
-
-        });
-
-        player.setWorldPosition(new Vector3(50, 100, 0));
-        player.faceForward();
-    };
 
     renderLoop(scene, camera, (dt) => {
 
@@ -193,6 +144,9 @@ let loopHooks: Array<(dt: number) => void> = [];
             const hudDistanceToGoal = document.querySelector<HTMLElement>("#hud-goal-distance");
             if (!hudDistanceToGoal) throw new Error("No #hud-goal-distance");
 
+            const totalRunTime = 120;
+            // 7 15s to work with
+            const times = [10, 10, 5, 5, 30];
             const timer = new GameTimer(dt, 60);
             let lost = false;
 
@@ -217,8 +171,7 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             scene.add(skybox);
 
-            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround(100000);
-            scene.add(phongGround);
+            const { ground, goal, setTrackDimensions, distanceToGoal, setGoalBrightness } = createGround(START_TRACK_LENGTH, trackWidth);
             scene.add(ground);
             scene.add(goal);
 
@@ -229,7 +182,6 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             const player = new Player(camera);
 
-            const times = [25, 20, 10, 5, 1];
 
             let onLastGoal = false;
             let won = false;
@@ -252,7 +204,6 @@ let loopHooks: Array<(dt: number) => void> = [];
                         newTime && timer.grantMoreTime(newTime);
                         flashTeal();
                         pauseRendering();
-                        console.log(getRandomUpgrades());
                         upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(), (selected: number) => {
 
                             if (selected === -1) {
@@ -270,6 +221,15 @@ let loopHooks: Array<(dt: number) => void> = [];
                                     increaseColliderSize(200);
                                 } else if (selectedUpgrade.name === "Extra Juicy!") {
                                     changeSpeed(20);
+                                } else if (selectedUpgrade.name === "Boost Fruit") {
+                                    fruitBoost += 10;
+                                } else if (selectedUpgrade.name === "MORE Fruit") {
+                                    fruitPerTrack += 50;
+                                } else if (selectedUpgrade.name === "LOADS of Fruit") {
+                                    fruitPerTrack += 300;
+                                } else if (selectedUpgrade.name === "Optic Fiber") {
+                                    trackWidth -= 1000;
+                                    setTrackWallZed(trackWidth / 2);
                                 }
                             }
 
@@ -278,20 +238,79 @@ let loopHooks: Array<(dt: number) => void> = [];
                                 resumeRendering();
                                 const newTrackLength = 100000;
                                 resetLevel(scene, player, newTrackLength);
-                                setTrackLength(newTrackLength);
+                                setTrackDimensions(newTrackLength, trackWidth);
                             }, 200);
                         });
                     } else {
-                        const newTrackLength = 100000;
+                        const newTrackLength = 500000;
                         resetLevel(scene, player, newTrackLength);
-                        setTrackLength(newTrackLength);
+                        setTrackDimensions(newTrackLength, trackWidth);
                         setGoalBrightness(0.8);
                         onLastGoal = true;
                     }
                 }
             });
 
-            resetLevel(scene, player, 100000);
+            let items: Item[] = [];
+            const resetLevel = (scene: Scene, player: Player, trackLength: number) => {
+
+                if (items.length > 0) {
+                    items.forEach(f => scene.remove(f.obj));
+                }
+
+                const randomPoints = [];
+                for (let i = 0; i < fruitPerTrack; i++) {
+                    let y = 0;
+                    if (projectGravitasActivated) {
+                        y = 100;
+                    } else {
+                        y = (Math.random() > .5 ? 400 : 100);
+                    }
+
+                    randomPoints.push(new Vector3(
+                        Math.random() * (trackLength),
+                        y,
+                        (Math.random() - 0.5) * (trackWidth - (trackWidth / 5))
+                    ));
+                }
+
+                items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {
+                    grantDecayingSpeedBonus(moreSpeed * fruitBoost, 2000, globalTime.getTime());
+                    changeSpeed(moreSpeed / 5);
+                    setGoalBrightness(0.4);
+                    setTimeout(() => {
+                        setGoalBrightness(0.0);
+                    }, 300);
+                }, (group: Group) => {
+                    requestAnimationFrame(() => {
+                        scene.remove(group);
+                    });
+                }));
+
+                items.forEach(f => {
+                    scene.add(f.obj)
+                    loopHooks.push(f.onLoop);
+                    setTimeout(() => {
+                        registerCollidingItem({
+                            obj: f.collidingObj,
+                            whenInRange: () => {
+                                f.onPlayerCollide();
+                            }
+                        });
+                    }, 100);
+
+                });
+
+                player.setWorldPosition(new Vector3(50, 100, 0));
+                player.faceForward();
+            };
+
+
+            resetLevel(scene, player, START_TRACK_LENGTH);
+
+            const HUD = document.querySelector<HTMLElement>("#hud-overlay");
+            if (!HUD) throw new Error("HUD.");
+            HUD.style.opacity = "1.0";
 
         }
 

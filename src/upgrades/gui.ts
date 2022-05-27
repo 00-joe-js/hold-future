@@ -62,39 +62,43 @@ class UpgradesManager {
         this.container.style.opacity = "1.0";
         this.setCurrentSelection();
 
-        this.listenForGamepadEvents((input: string) => {
+        setTimeout(() => {
+            this.listenForGamepadEvents((input: string) => {
 
-            if (!this.wantToSkip) {
-                if (input === "left") {
-                    this.changeSelection(-1);
-                } else if (input === "right") {
-                    this.changeSelection(1);
+                if (!this.wantToSkip) {
+                    if (input === "left") {
+                        this.changeSelection(-1);
+                    } else if (input === "right") {
+                        this.changeSelection(1);
+                    }
                 }
-            }
 
 
-            if (input === "up") {
-                this.unhighlightSkip();
-            } else if (input === "down") {
-                this.highlightSkip();
-            }
+                if (input === "up") {
+                    this.unhighlightSkip();
+                } else if (input === "down") {
+                    this.highlightSkip();
+                }
 
-            if (input === "select") {
+                if (input === "select") {
 
-                if (this.wantToSkip) {
-                    onSelection(-1);
-                } else {
-                    const upgrade = upgradeDescriptions[this.hoveredUpgradeIndex];
-                    if (upgrade.cost >= timeCoins) {
-                        return;
+                    if (this.wantToSkip) {
+                        onSelection(-1);
+                    } else {
+                        const upgrade = upgradeDescriptions[this.hoveredUpgradeIndex];
+                        if (upgrade.cost >= timeCoins) {
+                            return;
+                        }
+
+                        onSelection(this.hoveredUpgradeIndex);
                     }
 
-                    onSelection(this.hoveredUpgradeIndex);
                 }
 
-            }
+            });
+        }, 400);
 
-        });
+
     }
 
     changeSelection(dir: number) {

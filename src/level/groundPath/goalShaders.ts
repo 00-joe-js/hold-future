@@ -21,15 +21,13 @@ varying float v_noise;
 
 uniform sampler2D u_tex;
 
-float n(float v) {
-    return (v + 1.0) / 2.0;
-}
-
 void main (void)
 {
-  float r = (u_time / 500.0);
-  vec2 uv = vUv + vec2(n(sin(r)), n(cos(r)));
-  vec3 color = texture2D(u_tex, uv).rbg;
-  gl_FragColor = vec4(color * u_brightness, 1.0);
+  vec2 uv = vUv;
+  vec3 color = vec3(texture2D(u_tex, uv));
+  
+  float r = (sin(u_time / 50.0) + 1.0) / 2.0;
+
+  gl_FragColor = vec4(vec3(0, r * u_brightness / 4.0, 0.5), 0.5);
 }
 `;

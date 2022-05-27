@@ -6,7 +6,7 @@ import globalTime from "../../subscribe-to-global-render-loop";
 
 import noiseTex from "../../../assets/noisetextures/explosion.png";
 
-export default (initialTrackLength = 100000) => {
+export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
 
     const u = { uTime: { value: 0.0 } };
     const groundMat = new ShaderMaterial({
@@ -16,33 +16,27 @@ export default (initialTrackLength = 100000) => {
         fragmentShader
     });
 
-    const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 10000, specular: 0xffffff });
-
     const trackLength = initialTrackLength;
-    const trackWidth = 5000;
+    const trackWidth = initialTrackWidth;
 
-    const createGroundGeos = (len = trackLength) => {
+    const createGroundGeos = (len = trackLength, width = trackWidth) => {
         return [
-            new BoxGeometry(len, 0, trackWidth, 200, 1, 10),
-            new BoxGeometry(len, 0, trackWidth, 1, 1, 1)
+            new BoxGeometry(len, 0, width, 200, 1, 10),
+            new BoxGeometry(len, 0, width, 1, 1, 1)
         ];
     };
 
     let [groundG, groundP] = createGroundGeos();
 
     const ground = new Mesh(groundG, groundMat);
-    const phongGround = new Mesh(groundP, altGroundMat);
 
     ground.name = "ground";
     ground.layers.enable(7);
 
-    phongGround.position.y = -35;
-    ground.position.y = -5;
-
     const goalU = {
         u_time: { value: 0 },
         u_tex: { value: new TextureLoader().load(noiseTex) },
-        u_brightness: { value: 0.4 }
+        u_brightness: { value: 0.0 }
     };
 
     const setGoalBrightness = (v: number) => {
@@ -55,10 +49,11 @@ export default (initialTrackLength = 100000) => {
         fragmentShader: goalFShader
     });
 
-    const goalG = new PlaneGeometry(trackWidth, 20000);
+    const goalG = new BoxGeometry(10000, 10000, 20000, 1, 1, 1);
     const goal = new Mesh(goalG, goalMat);
 
-    goal.rotation.y = -Math.PI / 2;
+    goal.rotation.y = Math.PI / 2;
+    goal.position.y = 0;
     goal.position.x = trackLength - 1000;
 
     globalTime.subscribe((dt: number) => {
@@ -66,26 +61,24 @@ export default (initialTrackLength = 100000) => {
         goalU.u_time.value = dt;
     });
 
-    const setTrackLength = (len: number) => {
+    const setTrackDimensions = (len: number, width: number) => {
         groundG.dispose();
         groundP.dispose();
-        [groundG, groundP] = createGroundGeos(len);
+        [groundG, groundP] = createGroundGeos(len, width);
         ground.geometry = groundG;
-        phongGround.geometry = groundP;
 
         ground.position.x = len / 2;
-        phongGround.position.x = len / 2;
 
         goal.position.x = len - 1000;
     };
 
-    setTrackLength(trackLength);
+    setTrackDimensions(trackLength, trackWidth);
 
     const distanceToGoal = (pt: Vector3) => {
         // Length of track is x-axis.
         return goal.position.x - pt.x;
     };
 
-    return { ground, phongGround, goal, setTrackLength, distanceToGoal, setGoalBrightness };
+    return { ground, goal, setTrackDimensions, distanceToGoal, setGoalBrightness };
 
 };
