@@ -303,7 +303,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
         if (gamepadState) {
             if (gamepadState.moveVel.y !== 0) {
-                const y = MathUtils.clamp(gamepadState.moveVel.y, -1, 1);
+                const y = MathUtils.clamp(gamepadState.moveVel.y, 0, 1);
                 moveForward(speed * y, movementVector);
             }
             if (gamepadState.moveVel.x !== 0) {
@@ -354,7 +354,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
         const finalGrounded = checkIsGrounded(camera.position);
 
-        if (finalGrounded.grounded) {
+        if (finalGrounded.grounded && !movementVector.equals(ZERO_VEC3)) {
             // Lifts the camera away from solid surface beneath.
             applyHeadBob(movementVector);
         }
@@ -393,6 +393,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         gameLoopFn,
         registerCollidingItem(item: RegisteredItem) {
             itemPickupManager.registerPickupableItem(item);
+        },
+        increaseColliderSize(v: number) {
+            itemPickupManager.setCollisionDistance(itemPickupManager.collisionDistance + v);
         },
         grantDecayingSpeedBonus(totalBonus: number, decayOverMs: number, initialDt: number) {
             speedBonuses.push({ totalBonus, decayOverMs, initialDt });

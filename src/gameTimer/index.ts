@@ -16,6 +16,10 @@ class GameTimer {
         this.terminateDt += moreTime * 1000;
     }
 
+    deductTime(deductedTime: number) {
+        this.terminateDt -= deductedTime * 1000;
+    }
+
     getTimeLeft() {
         return (this.terminateDt - this.currentDt) / 1000;
     }

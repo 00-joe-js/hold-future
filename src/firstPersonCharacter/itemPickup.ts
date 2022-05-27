@@ -26,6 +26,10 @@ class ItemPickupManager {
         };
     }
 
+    setCollisionDistance(newValue: number) {
+        this.collisionDistance = newValue;
+    }
+
     testAndTriggerListeners() {
         this.onUpdate();
 

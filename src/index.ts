@@ -25,6 +25,24 @@ window.HYPER_BLUE = new Color(0xaaffff);
 window.POWERED_PINKRED = new Color(0xffeeee);
 // ---
 
+const TEST_UPGRADES = [
+    {
+        name: "Hello, Neighbor!",
+        description: `Your sphere of influence is stronger. <strong>Pull in speed fruit that are farther away</strong>.`,
+        cost: 10
+    },
+    {
+        name: "The Juice.",
+        description: `<strong>Increase your base speed by 5m/s</strong>. It's not fancy, but it's fast.`,
+        cost: 5
+    },
+    {
+        name: "Project Gravitas",
+        description: `<strong>All speed fruit will be grounded.</strong> Who needs to jump anyway!`,
+        cost: 20
+    }
+];
+
 import { renderLoop } from "./renderer";
 import setupFPSCharacter from "./firstPersonCharacter";
 
@@ -36,9 +54,10 @@ import globalTime from "./subscribe-to-global-render-loop";
 import createGround from "./level/groundPath";
 import createSpeedFruit, { Item } from "./items/speedFruit";
 import GameTimer from "./gameTimer";
+import upgradesManager from "./upgrades/gui";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(110, RESOLUTION, 1, 1500000);
+const camera = new PerspectiveCamera(80, RESOLUTION, 1, 1500000);
 
 let sceneMade = false;
 let paused = false;
@@ -50,13 +69,15 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     const skybox = await createSkybox();
 
-    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed, setSpeed, grantDecayingSpeedBonus, freezePlayer } = await setupFPSCharacter(camera, scene);
+    let projectGravitasActivated = false;
+
+    const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed, setSpeed, grantDecayingSpeedBonus, freezePlayer, increaseColliderSize } = await setupFPSCharacter(camera, scene);
 
     loopHooks.push((dt) => {
         if (protectPause) return;
         const gamepadState = gamepad.getState();
         if (!gamepadState) return;
-        
+
         if (gamepadState.pauseDown && !paused) {
             paused = true;
             protectPause = true;
@@ -102,7 +123,18 @@ let loopHooks: Array<(dt: number) => void> = [];
 
         const randomPoints = [];
         for (let i = 0; i < 50; i++) {
-            randomPoints.push(new Vector3(1000 + (Math.random() * (trackLength - 5000)), (Math.random() > .5 ? 400 : 100), (Math.random() - 0.5) * 4000));
+            let y = 0;
+            if (projectGravitasActivated) {
+                y = 100;
+            } else {
+                y = (Math.random() > .5 ? 400 : 100);
+            }
+
+            randomPoints.push(new Vector3(
+                Math.random() * (trackLength),
+                y,
+                (Math.random() - 0.5) * 4000
+            ));
         }
 
         items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {
@@ -128,7 +160,7 @@ let loopHooks: Array<(dt: number) => void> = [];
 
         });
 
-        player.setWorldPosition(new Vector3(0, 100, 0));
+        player.setWorldPosition(new Vector3(50, 100, 0));
         player.faceForward();
     };
 
@@ -158,7 +190,7 @@ let loopHooks: Array<(dt: number) => void> = [];
                 hudTimerEle.innerText = timer.getTimeLeft().toPrecision(4);
             });
 
-            loopHooks.push(dt => {
+            loopHooks.push(() => {
                 if (Math.random() > .9) {
                     hudDistanceToGoal.innerText = Math.floor(distanceToGoal(player.camera.position)).toLocaleString("en-US") + "m";
                 }
@@ -166,7 +198,7 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             scene.add(skybox);
 
-            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround();
+            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround(20000);
             scene.add(phongGround);
             scene.add(ground);
             scene.add(goal);
@@ -195,20 +227,49 @@ let loopHooks: Array<(dt: number) => void> = [];
                         window.location.reload();
                     }
 
-                    const newTrackLength = 100000 + (Math.floor(Math.random() * 10000));
-                    resetLevel(scene, player, newTrackLength);
-                    setTrackLength(newTrackLength);
+
                     if (times.length > 0) {
                         const newTime = times.shift();
                         newTime && timer.grantMoreTime(newTime);
                         flashTeal();
+                        pauseRendering();
+                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), TEST_UPGRADES, (selected: number) => {
+
+                            if (selected === -1) {
+                                // Skip.
+                            } else {
+                                const selectedUpgrade = TEST_UPGRADES[selected];
+
+                                timer.deductTime(selectedUpgrade.cost);
+
+                                if (selectedUpgrade.name === "Project Gravitas") {
+                                    projectGravitasActivated = true;
+                                } else if (selectedUpgrade.name === "The Juice.") {
+                                    changeSpeed(5);
+                                } else if (selectedUpgrade.name === "Hello, Neighbor!") {
+                                    increaseColliderSize(200);
+                                }
+                            }
+
+                            upgradesManager.hideContainer();
+                            setTimeout(() => {
+                                resumeRendering();
+                                const newTrackLength = 100000;
+                                resetLevel(scene, player, newTrackLength);
+                                setTrackLength(newTrackLength);
+                            }, 200);
+                        });
                     } else {
+                        const newTrackLength = 100000;
+                        resetLevel(scene, player, newTrackLength);
+                        setTrackLength(newTrackLength);
                         setGoalBrightness(0.8);
                         onLastGoal = true;
                     }
                 }
             });
-            resetLevel(scene, player, 100000);
+
+            resetLevel(scene, player, 20000);
 
         }
 

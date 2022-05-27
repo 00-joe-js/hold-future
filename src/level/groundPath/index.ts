@@ -5,9 +5,8 @@ import { vertexShader as goalVShader, fragmentShader as goalFShader } from "./go
 import globalTime from "../../subscribe-to-global-render-loop";
 
 import noiseTex from "../../../assets/noisetextures/explosion.png";
-import Player from "../../firstPersonCharacter/PlayerClass";
 
-export default () => {
+export default (initialTrackLength = 100000) => {
 
     const u = { uTime: { value: 0.0 } };
     const groundMat = new ShaderMaterial({
@@ -19,7 +18,7 @@ export default () => {
 
     const altGroundMat = new MeshPhongMaterial({ color: 0x000000, shininess: 10000, specular: 0xffffff });
 
-    const trackLength = 100000;
+    const trackLength = initialTrackLength;
     const trackWidth = 5000;
 
     const createGroundGeos = (len = trackLength) => {
