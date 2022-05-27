@@ -1,8 +1,9 @@
 
 const container = document.querySelector<HTMLElement>("#upgrades-container");
 
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
+
+import clippyGif from "../../assets/testclippy.gif";
 
 if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");
@@ -40,11 +41,18 @@ class UpgradesManager {
         moneySlot.innerText = t.toString();
     }
 
+    setClippy() {
+        const clippyImg = this.container.querySelector<HTMLImageElement>("#clippy");
+        if (!clippyImg) throw new Error("I see you're running into an error? :)");
+        clippyImg.src = clippyGif;
+    }
+
     showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onSelection: Function) {
 
         const choices = this.getChoices();
 
         this.setMoney(timeCoins);
+        this.setClippy();
 
         choices.forEach((c, i) => {
             const { name, description, cost } = upgradeDescriptions[i];
@@ -186,7 +194,7 @@ class UpgradesManager {
             let up = kb.wDown;
             let down = kb.sDown;
             let submit = kb.spaceDown;
-            
+
             if (gs) {
                 right = gs.moveVel.x > moveSens;
                 left = gs.moveVel.x < -moveSens;

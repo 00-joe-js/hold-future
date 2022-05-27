@@ -178,11 +178,17 @@ body {
 }
 
 #control-hint {
+  position: relative;
   background: rgba(200, 200, 20, 0.9);
   color: black;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-family: monospace;
   width: 30%;
   margin-left: auto;
   padding: 2rem;
+  display: flex;
+}
+
+#clippy {
+  transform: scale(2);
 }
