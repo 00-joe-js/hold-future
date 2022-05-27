@@ -84,6 +84,7 @@ class UpgradesManager {
 
                     if (this.wantToSkip) {
                         onSelection(-1);
+                        this.cleanup();
                     } else {
                         const upgrade = upgradeDescriptions[this.hoveredUpgradeIndex];
                         if (upgrade.cost >= timeCoins) {
@@ -91,6 +92,7 @@ class UpgradesManager {
                         }
 
                         onSelection(this.hoveredUpgradeIndex);
+                        this.cleanup();
                     }
 
                 }
@@ -99,6 +101,12 @@ class UpgradesManager {
         }, 400);
 
 
+    }
+
+    cleanup() {
+        this.wantToSkip = false;
+        this.unhighlightSkip();
+        this.hoveredUpgradeIndex = 0;
     }
 
     changeSelection(dir: number) {
@@ -155,6 +163,7 @@ class UpgradesManager {
         let leftTriggered = false;
         let upTriggered = false;
         let downTriggered = false;
+        let selectedTriggered = false;
 
         const listening = () => {
             if (this.cancelListener) {
@@ -199,7 +208,12 @@ class UpgradesManager {
             }
 
             if (gs.xDown) {
+                if (selectedTriggered) return;
                 fn("select");
+                selectedTriggered = true;
+                setTimeout(() => {
+                    selectedTriggered = false;
+                }, 1000);
             }
         };
         window.requestAnimationFrame(listening);

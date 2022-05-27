@@ -228,7 +228,7 @@ let loopHooks: Array<(dt: number) => void> = [];
                                 } else if (selectedUpgrade.name === "LOADS of Fruit") {
                                     fruitPerTrack += 300;
                                 } else if (selectedUpgrade.name === "Optic Fiber") {
-                                    trackWidth -= 1000;
+                                    trackWidth -= 1750;
                                     setTrackWallZed(trackWidth / 2);
                                 }
                             }
