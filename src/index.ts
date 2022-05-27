@@ -53,6 +53,7 @@ import createGround from "./level/groundPath";
 import createSpeedFruit, { Item } from "./items/speedFruit";
 import GameTimer from "./gameTimer";
 import upgradesManager from "./upgrades/gui";
+import ProgressBar from "./progressBar";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(80, RESOLUTION, 1, 200000000);
@@ -68,7 +69,6 @@ let loopHooks: Array<(dt: number) => void> = [];
     const skybox = await createSkybox();
 
     // UPGRADE VALUES other than SPEED.
-    let START_TRACK_LENGTH = 2000;
     let trackWidth = 5000;
     let projectGravitasActivated = false;
     let fruitBoost = 10;
@@ -86,6 +86,7 @@ let loopHooks: Array<(dt: number) => void> = [];
         increaseColliderSize,
         setTrackWallZed
     } = await setupFPSCharacter(camera, scene);
+
 
     loopHooks.push((dt) => {
         if (protectPause) return;
@@ -146,9 +147,32 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             const totalRunTime = 120;
             // 7 15s to work with
+
+
+            let START_TRACK_LENGTH = 50000;
+            let NORMAL_TRACK_LENGTH = 100000;
+            let FINAL_DOWNLOAD_LENGTH = 500000;
+            let TOTAL_DOWNLOAD_LENGTH = START_TRACK_LENGTH + (NORMAL_TRACK_LENGTH * 5) + FINAL_DOWNLOAD_LENGTH;
+
             const times = [10, 10, 5, 5, 30];
             const timer = new GameTimer(dt, 60);
             let lost = false;
+
+            const progressBar = new ProgressBar(TOTAL_DOWNLOAD_LENGTH, [
+                [50000 / TOTAL_DOWNLOAD_LENGTH, 10],
+                [150000 / TOTAL_DOWNLOAD_LENGTH, 10],
+                [250000 / TOTAL_DOWNLOAD_LENGTH, 5],
+                [350000 / TOTAL_DOWNLOAD_LENGTH, 5],
+                [450000 / TOTAL_DOWNLOAD_LENGTH, 30]
+            ]);
+
+            let lastRecordedDistance = 0;
+            loopHooks.push(() => {
+                const x = camera.position.x;
+                progressBar.addDistance(x - lastRecordedDistance);
+                lastRecordedDistance = x;
+            });
+
 
             loopHooks.push(dt => {
                 timer.updateCurrentTime(dt);
@@ -163,15 +187,9 @@ let loopHooks: Array<(dt: number) => void> = [];
                 hudTimerEle.innerText = timer.getTimeLeft().toPrecision(4);
             });
 
-            loopHooks.push(() => {
-                if (Math.random() > .9) {
-                    hudDistanceToGoal.innerText = Math.floor(distanceToGoal(player.camera.position)).toLocaleString("en-US") + "m";
-                }
-            });
-
             scene.add(skybox);
 
-            const { ground, goal, setTrackDimensions, distanceToGoal, setGoalBrightness } = createGround(START_TRACK_LENGTH, trackWidth);
+            const { ground, goal, setTrackDimensions, setGoalBrightness } = createGround(START_TRACK_LENGTH, trackWidth);
             scene.add(ground);
             scene.add(goal);
 
@@ -189,6 +207,13 @@ let loopHooks: Array<(dt: number) => void> = [];
             registerCollidingItem({
                 obj: goal,
                 whenInRange: () => {
+
+                    // Must be close enough
+                    const playerX = camera.position.x;
+                    const goalX = goal.position.x;
+                    if (playerX > goalX) {
+                        return;
+                    }
 
                     if (won) return;
 
@@ -234,6 +259,7 @@ let loopHooks: Array<(dt: number) => void> = [];
                             }
 
                             upgradesManager.hideContainer();
+                            progressBar.addDistance(goal.position.x - camera.position.x);
                             setTimeout(() => {
                                 resumeRendering();
                                 const newTrackLength = 100000;
@@ -253,6 +279,8 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             let items: Item[] = [];
             const resetLevel = (scene: Scene, player: Player, trackLength: number) => {
+
+                lastRecordedDistance = 0;
 
                 if (items.length > 0) {
                     items.forEach(f => scene.remove(f.obj));

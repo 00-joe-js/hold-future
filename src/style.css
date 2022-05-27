@@ -79,7 +79,7 @@ body {
 
 #hud-time {
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 50%;
 
   transform: translate(-50%, -50%);
@@ -92,19 +92,56 @@ body {
   font-family: monospace;
 }
 
-#hud-goal-distance {
+#progress-bar {
   position: absolute;
   top: 15%;
   left: 50%;
-
   transform: translate(-50%, -50%);
+  width: 500px;
+  height: 20px;
+  border: rgb(223, 56, 126) 2px solid;
+}
 
-  margin: 0 auto;
+#progress-bar h6 {
+  color: rgb(117, 30, 72);
+  position: absolute;
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+#progress-moving-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgb(223, 56, 126);
+}
+
+#progress-percentage {
   font-size: 2rem;
   color: rgb(223, 56, 126);
-  padding: 0.5rem;
   text-align: center;
   font-family: monospace;
+}
+
+.progress-marker {
+  display: block;
+  position: absolute;
+  top: -5px;
+  left: 0;
+  height: 25px;
+  width: 2px;
+  background: rgb(0, 255, 255);
+}
+
+.progress-marker span {
+  color: rgb(0, 255, 255);
+  font-size: 1rem;
+  font-style: italic;
+  font-family: monospace;
+  position: absolute;
+  top: -1.5rem;
+  left: -1rem;
 }
 
 #upgrades-container {
@@ -118,7 +155,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 2rem
+  padding-top: 2rem;
 }
 
 #upgrade-list {
@@ -160,7 +197,8 @@ body {
 }
 
 .upgrade-choice p {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  margin: 0;
 }
 
 .upgrade-choice p strong {

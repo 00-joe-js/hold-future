@@ -72,7 +72,6 @@ class UpgradesManager {
             costStrong.innerText = cost.toString();
             icon.style.backgroundImage = `url(${icons})`;
             
-            console.log(iconPos);
             if (iconPos) {
                 icon.style.backgroundPosition = `${iconPos[0]}px ${iconPos[1]}px`;
             }

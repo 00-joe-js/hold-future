@@ -49,12 +49,12 @@ export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
         fragmentShader: goalFShader
     });
 
-    const goalG = new BoxGeometry(10000, 10000, 20000, 1, 1, 1);
+    const goalG = new BoxGeometry(trackLength, 30000, trackWidth, 1, 1, 1);
     const goal = new Mesh(goalG, goalMat);
 
     goal.rotation.y = Math.PI / 2;
     goal.position.y = 0;
-    goal.position.x = trackLength - 1000;
+    goal.position.x = trackLength;
 
     globalTime.subscribe((dt: number) => {
         u.uTime.value = dt;
@@ -68,8 +68,7 @@ export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
         ground.geometry = groundG;
 
         ground.position.x = len / 2;
-
-        goal.position.x = len - 1000;
+        goal.position.x = len;
     };
 
     setTrackDimensions(trackLength, trackWidth);
