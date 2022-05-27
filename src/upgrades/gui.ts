@@ -1,6 +1,7 @@
 
 const container = document.querySelector<HTMLElement>("#upgrades-container");
 
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 import { gamepad } from "../firstPersonCharacter/inputHelper";
 
 if (!container) {
@@ -79,14 +80,15 @@ class UpgradesManager {
             }
 
             if (input === "select") {
-                const upgrade = upgradeDescriptions[this.hoveredUpgradeIndex];
-                if (upgrade.cost >= timeCoins) {
-                    return;
-                }
 
                 if (this.wantToSkip) {
                     onSelection(-1);
                 } else {
+                    const upgrade = upgradeDescriptions[this.hoveredUpgradeIndex];
+                    if (upgrade.cost >= timeCoins) {
+                        return;
+                    }
+
                     onSelection(this.hoveredUpgradeIndex);
                 }
 

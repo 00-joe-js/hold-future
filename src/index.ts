@@ -39,9 +39,28 @@ const TEST_UPGRADES = [
     {
         name: "Project Gravitas",
         description: `<strong>All speed fruit will be grounded.</strong> Who needs to jump anyway!`,
+        cost: 35
+    },
+    {
+        name: "Extra Juicy!",
+        description: `For those days you really the juice. <strong>Increase your base speed by 20m/s</strong>! Sometimes you gotta splurge.`,
         cost: 20
     }
 ];
+
+function shuffleArray(array: Array<any>) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+const getRandomUpgrades = () => {
+    return shuffleArray(TEST_UPGRADES).slice(0, 3);
+};
 
 import { renderLoop } from "./renderer";
 import setupFPSCharacter from "./firstPersonCharacter";
@@ -57,7 +76,7 @@ import GameTimer from "./gameTimer";
 import upgradesManager from "./upgrades/gui";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(80, RESOLUTION, 1, 1500000);
+const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
 
 let sceneMade = false;
 let paused = false;
@@ -198,7 +217,7 @@ let loopHooks: Array<(dt: number) => void> = [];
 
             scene.add(skybox);
 
-            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround(20000);
+            const { ground, goal, phongGround, setTrackLength, distanceToGoal, setGoalBrightness } = createGround(100000);
             scene.add(phongGround);
             scene.add(ground);
             scene.add(goal);
@@ -233,7 +252,8 @@ let loopHooks: Array<(dt: number) => void> = [];
                         newTime && timer.grantMoreTime(newTime);
                         flashTeal();
                         pauseRendering();
-                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), TEST_UPGRADES, (selected: number) => {
+                        console.log(getRandomUpgrades());
+                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(), (selected: number) => {
 
                             if (selected === -1) {
                                 // Skip.
@@ -248,6 +268,8 @@ let loopHooks: Array<(dt: number) => void> = [];
                                     changeSpeed(5);
                                 } else if (selectedUpgrade.name === "Hello, Neighbor!") {
                                     increaseColliderSize(200);
+                                } else if (selectedUpgrade.name === "Extra Juicy!") {
+                                    changeSpeed(20);
                                 }
                             }
 
@@ -269,7 +291,7 @@ let loopHooks: Array<(dt: number) => void> = [];
                 }
             });
 
-            resetLevel(scene, player, 20000);
+            resetLevel(scene, player, 100000);
 
         }
 
