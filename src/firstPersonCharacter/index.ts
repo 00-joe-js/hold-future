@@ -303,9 +303,8 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         speed += calculateSpeedBonuses(dt);
 
         if (gamepadState) {
-            if (gamepadState.moveVel.y !== 0) {
-                const y = MathUtils.clamp(gamepadState.moveVel.y, 0, 1);
-                moveForward(speed * y, movementVector);
+            if (gamepadState.moveVel.y > 0.3) {
+                moveForward(speed, movementVector);
             }
             if (gamepadState.moveVel.x !== 0) {
                 moveRight(speed * 0.7 * gamepadState.moveVel.x, movementVector);
@@ -318,10 +317,10 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
                 moveForward(-speed, movementVector);
             }
             if (keyboard.aDown) {
-                moveRight(-speed * 0.7, movementVector);
+                moveRight(-speed * 0.55, movementVector);
             }
             if (keyboard.dDown) {
-                moveRight(speed * 0.7, movementVector);
+                moveRight(speed * 0.55, movementVector);
             }
         }
 

@@ -2,7 +2,7 @@
 const container = document.querySelector<HTMLElement>("#upgrades-container");
 
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
-import { gamepad } from "../firstPersonCharacter/inputHelper";
+import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
 
 if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");
@@ -17,11 +17,13 @@ interface Upgrade {
 
 class UpgradesManager {
 
+    private keyboard: KeyboardInterface;
     private cancelListener: boolean = false;
     private hoveredUpgradeIndex: number = 0;
     private wantToSkip: boolean = false;
     private container: HTMLElement;
     constructor(domContainer: HTMLElement) {
+        this.keyboard = new KeyboardInterface();
         this.container = domContainer;
     }
 
@@ -63,7 +65,7 @@ class UpgradesManager {
         this.setCurrentSelection();
 
         setTimeout(() => {
-            this.listenForGamepadEvents((input: string) => {
+            this.listenForInputEvents((input: string) => {
 
                 if (!this.wantToSkip) {
                     if (input === "left") {
@@ -158,7 +160,8 @@ class UpgradesManager {
         chosen.style.opacity = "1.0";
     }
 
-    listenForGamepadEvents(fn: (i: string) => void) {
+    listenForInputEvents(fn: (i: string) => void) {
+
         let rightTriggered = false;
         let leftTriggered = false;
         let upTriggered = false;
@@ -173,16 +176,33 @@ class UpgradesManager {
             window.requestAnimationFrame(listening);
 
             const gs = gamepad.getState();
-            if (!gs) return;
+            const kb = this.keyboard;
+            if (!kb) return;
 
-            if (gs.moveVel.x > 0.7) {
+            let moveSens = 0.5;
+
+            let right = kb.dDown;
+            let left = kb.aDown;
+            let up = kb.wDown;
+            let down = kb.sDown;
+            let submit = kb.spaceDown;
+            
+            if (gs) {
+                right = gs.moveVel.x > moveSens;
+                left = gs.moveVel.x < -moveSens;
+                up = gs.moveVel.y > moveSens;
+                down = gs.moveVel.y < -moveSens;
+                submit = gs.xDown;
+            }
+
+            if (right) {
                 if (rightTriggered) return;
                 fn("right");
                 rightTriggered = true;
                 setTimeout(() => {
                     rightTriggered = false;
                 }, 200);
-            } else if (gs.moveVel.x < -0.7) {
+            } else if (left) {
                 if (leftTriggered) return;
                 fn("left");
                 leftTriggered = true;
@@ -191,14 +211,14 @@ class UpgradesManager {
                 }, 200);
             }
 
-            if (gs.moveVel.y > 0.7) {
+            if (up) {
                 if (upTriggered) return;
                 fn("up");
                 upTriggered = true;
                 setTimeout(() => {
                     upTriggered = false;
                 }, 200);
-            } else if (gs.moveVel.y < -0.7) {
+            } else if (down) {
                 if (downTriggered) return;
                 fn("down");
                 downTriggered = true;
@@ -207,7 +227,7 @@ class UpgradesManager {
                 }, 200);
             }
 
-            if (gs.xDown) {
+            if (submit) {
                 if (selectedTriggered) return;
                 fn("select");
                 selectedTriggered = true;
