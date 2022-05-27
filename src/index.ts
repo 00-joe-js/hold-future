@@ -1,14 +1,10 @@
 import "./style.css";
 
-import { Scene, PerspectiveCamera, AmbientLight, DirectionalLight, MeshPhongMaterial, BoxGeometry, Color, MathUtils, ShaderMaterial, Vector3, Euler, Group, _SRGBAFormat } from "three";
-import { Mesh, UniformsUtils, ShaderLib, BufferAttribute, SphereBufferGeometry } from "three";
+import { Scene, PerspectiveCamera, AmbientLight, Color, Vector3, Group, _SRGBAFormat } from "three";
+import { flashTeal, pauseRendering, resumeRendering } from "./renderer/index";
 
-import customPhongVertex from "./shading/customPhongVertex";
+import { gamepad } from "./firstPersonCharacter/inputHelper";
 
-import { flashTeal } from "./renderer/index";
-
-
-import loadModels from "./importHelpers/gltfLoader";
 
 /* GLOBALS */
 declare global {
@@ -42,18 +38,45 @@ import createSpeedFruit, { Item } from "./items/speedFruit";
 import GameTimer from "./gameTimer";
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(70, RESOLUTION, 1, 1500000);
+const camera = new PerspectiveCamera(110, RESOLUTION, 1, 1500000);
 
 let sceneMade = false;
+let paused = false;
+let protectPause = false;
 
 let loopHooks: Array<(dt: number) => void> = [];
 
 (async () => {
 
     const skybox = await createSkybox();
-    const models = await loadModels();
 
     const { gameLoopFn, registerCollidingItem, changeSpeed, getSpeed, setSpeed, grantDecayingSpeedBonus, freezePlayer } = await setupFPSCharacter(camera, scene);
+
+    loopHooks.push((dt) => {
+        if (protectPause) return;
+        const gamepadState = gamepad.getState();
+        if (!gamepadState) return;
+        
+        if (gamepadState.pauseDown && !paused) {
+            paused = true;
+            protectPause = true;
+            setTimeout(() => {
+                protectPause = false;
+            }, 200);
+            pauseRendering(true, () => {
+                if (protectPause === true) return;
+                const gp = gamepad.getState();
+                if (gp && gp.pauseDown) {
+                    paused = false;
+                    protectPause = true;
+                    setTimeout(() => {
+                        protectPause = false;
+                    }, 200);
+                    resumeRendering();
+                }
+            });
+        }
+    });
 
     loopHooks.push(gameLoopFn);
 
@@ -63,6 +86,7 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     const speedInterface = document.querySelector<HTMLElement>("#speed");
     if (!speedInterface) throw new Error("Speed interface?");
+
     loopHooks.push((dt) => {
         if (Math.random() > .5) {
             speedInterface.innerText = getSpeed(dt).toFixed(2);
@@ -107,7 +131,6 @@ let loopHooks: Array<(dt: number) => void> = [];
         player.setWorldPosition(new Vector3(0, 100, 0));
         player.faceForward();
     };
-
 
     renderLoop(scene, camera, (dt) => {
 

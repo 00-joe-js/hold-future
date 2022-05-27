@@ -107,7 +107,7 @@ export class MouseInterface {
 
 }
 
-export class GamepadInterface {
+class GamepadInterface {
 
     gamepad: Gamepad | null;
     gamepadAvailable: boolean;
@@ -146,13 +146,14 @@ export class GamepadInterface {
 
         const xDown = buttonValues[3] === 1;
         const zRDown = buttonValues[7] === 1;
+        const pauseDown = buttonValues[9] === 1;
 
         const moveScale = 2;
         const moveVel = new Vector2(gamepad.axes[0], gamepad.axes[1] * moveScale * -1);
 
         const lookScale = 30;
         const lookVel = new Vector2(gamepad.axes[2] * lookScale, gamepad.axes[3] * lookScale);
-        return { lookVel, moveVel, xDown, zRDown };
+        return { lookVel, moveVel, xDown, zRDown, pauseDown };
     }
 
     private listenForGamepadConnect() {
@@ -162,6 +163,8 @@ export class GamepadInterface {
     }
 
 }
+
+export const gamepad = new GamepadInterface();
 
 
 export default KeyboardInterface;

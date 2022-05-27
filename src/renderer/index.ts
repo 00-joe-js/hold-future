@@ -99,6 +99,22 @@ export const flashTeal = () => {
 
 };
 
+let renderPaused = false;
+let runDuringPause: Function | null = null;
+let deltaTimePaused: number | null = null;
+let deltaTimePauseOffset = 0;
+export const pauseRendering = (pause: boolean = true, fn?: Function) => {
+    renderPaused = pause;
+    if (pause === false) {
+        runDuringPause = null
+    } else if (pause === true && fn) {
+        runDuringPause = fn;
+    }
+};
+
+export const resumeRendering = () => {
+    pauseRendering(false);
+};
 
 export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) => void) => {
 
@@ -111,11 +127,26 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
 
     copyPass.renderToScreen = true;
 
-    const internalLoop = (deltaTime: number) => {
+    const internalLoop = (absoluteCurrentTime: number) => {
         window.requestAnimationFrame(internalLoop);
-        onLoop(deltaTime);
-        composer.render(deltaTime);
+        if (!renderPaused) {
+            if (deltaTimePaused !== null) {
+                console.log(`Adding ${absoluteCurrentTime - deltaTimePaused} (${deltaTimePaused}, ${absoluteCurrentTime})`);
+                deltaTimePauseOffset += absoluteCurrentTime - deltaTimePaused;
+                deltaTimePaused = null;
+            }
+            onLoop(absoluteCurrentTime - deltaTimePauseOffset);
+            composer.render();
+        } else {
+            if (deltaTimePaused === null) {
+                deltaTimePaused = absoluteCurrentTime;
+            }
+            if (runDuringPause) {
+                runDuringPause(absoluteCurrentTime);
+            }
+        }
     };
+
     window.requestAnimationFrame(internalLoop);
 
 };

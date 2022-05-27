@@ -1,6 +1,6 @@
 import { Camera, Vector3, Euler, MathUtils, BufferGeometry, LineBasicMaterial, Line, Scene, Raycaster, Event, Layers, Intersection, Object3D, Matrix3, Color } from "three";
 
-import Keyboard, { MouseInterface, GamepadInterface } from "./inputHelper";
+import Keyboard, { MouseInterface, gamepad } from "./inputHelper";
 import ItemPickupManager, { RegisteredItem } from "./itemPickup";
 
 const canvasElement = document.querySelector("#three-canvas");
@@ -27,7 +27,6 @@ canvasElement.addEventListener("click", () => {
 
 const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
-    const gamepad = new GamepadInterface();
     await gamepad.waitForGamepadConnect();
 
     const keyboard = new Keyboard();
