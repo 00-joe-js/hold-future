@@ -5,17 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project</title>
-  <script type="module" crossorigin src="assets/index.8ab0bc54.js"></script>
-  <link rel="stylesheet" href="assets/index.5735bf38.css">
+  <script type="module" crossorigin src="assets/index.183fadac.js"></script>
+  <link rel="stylesheet" href="assets/index.199604a2.css">
 </head>
 
-<body>
+<body style="background: rgb(2, 0, 2);">
     <div id="app">
         <div id="virtual-monitor">
-            <div id="hud-overlay">
-                <p id="speed">0.0</p>
+            <div id="hud-overlay" style="opacity: 0;">
+                <p id="speed"><span id="total-speed">0.0</span> <span id="base-speed">Base speed:
+                        <strong>0.0</strong></span></p>
                 <p id="hud-time">0.0</p>
                 <p id="hud-goal-distance">0.0</p>
+                <div id="upgrades-container">
+                    <h1 id="upgrade-heading">You've got <span>80</span> seconds! Spend some of it?</h1>
+                    <div id="upgrade-list">
+                        <div class="upgrade-choice">
+                            <h1 class="upgrade-name">Hello, Neighbor!</h1>
+                            <p>
+                                Your sphere of influence is stronger. <strong>Pull in speed fruit that are farther
+                                    away</strong>.
+                            </p>
+                            <h3>Cost: <strong>10</strong> seconds</h3>
+                        </div>
+                        <div class="upgrade-choice">
+                            <h1 class="upgrade-name">The Juice.</h1>
+                            <p>
+                                <strong>Increase your base speed by 5m/s</strong>. It's not fancy, but it's fast.
+                            </p>
+                            <h3>Cost: <strong>2</strong> seconds</h3>
+                        </div>
+                        <div class="upgrade-choice">
+                            <h1 class="upgrade-name">project gravitas</h1>
+                            <p>
+                                <strong>All speed fruit will be grounded.</strong> Who needs to jump anyway!
+                            </p>
+                            <h3>Cost: <strong>20</strong> seconds</h3>
+                        </div>
+                    </div>
+                    <h3 id="skip">KEEP MY TIME</h3>
+                    <h4 id="control-hint">
+                        <span>This is a mouseless interface! Use controls + jump to select.<br />Or, plug in your
+                            gamepad?</span>
+                        <img id="clippy" />
+                    </h4>
+
+                </div>
             </div>
             <div id="three-canvas-container">
                 <canvas id="three-canvas"></canvas>
