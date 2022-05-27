@@ -131,14 +131,16 @@ body {
   font-family: monospace;
   color: rgb(0, 205, 205);
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 4rem;
 }
 
 .upgrade-choice {
   font-family: monospace;
-  background: rgba(30, 30, 30, 0.9);
+  background: rgba(150, 150, 150, 0.9);
   color: white;
+  border: 6px solid darkgray;
+  border-style: groove;
   width: 25%;
   padding: 2rem;
   text-align: center;
@@ -146,33 +148,45 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 }
 
 .upgrade-name {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.8rem;
+  margin-top: 2rem;
+  text-decoration: underline;
+  color: rgb(0, 0, 255);
 }
 
 .upgrade-choice p {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .upgrade-choice p strong {
-  color: rgb(211, 255, 222);
+  color: rgb(191, 235, 202);
 }
 
 .upgrade-choice h3 strong {
-  color: rgb(0, 205, 205);
+  color: rgb(0, 225, 225);
   font-size: 2.5rem;
+}
+
+.upgrade-icon {
+  width: 35px;
+  height: 35px;
+  transform: scale(1.75);
+  background-position: -420px -295px;
 }
 
 #skip {
   font-family: monospace;
   color: gray;
   text-align: center;
-  font-size: 3rem;
+  font-size: 4rem;
+  background: white;
   transition: color 0.5s linear, transform 0.2s linear;
-  width: 50%;
+  width: 40%;
   margin: 0 auto;
   margin-top: 4rem;
 }

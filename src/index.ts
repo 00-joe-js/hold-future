@@ -68,7 +68,7 @@ let loopHooks: Array<(dt: number) => void> = [];
     const skybox = await createSkybox();
 
     // UPGRADE VALUES other than SPEED.
-    let START_TRACK_LENGTH = 50000;
+    let START_TRACK_LENGTH = 2000;
     let trackWidth = 5000;
     let projectGravitasActivated = false;
     let fruitBoost = 10;

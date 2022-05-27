@@ -4,6 +4,7 @@ const container = document.querySelector<HTMLElement>("#upgrades-container");
 import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
 
 import clippyGif from "../../assets/testclippy.gif";
+import icons from "../../assets/iconset.jpg";
 
 if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");
@@ -13,6 +14,7 @@ interface Upgrade {
     name: string;
     description: string;
     cost: number;
+    iconPos?: number[]
 }
 
 
@@ -55,18 +57,25 @@ class UpgradesManager {
         this.setClippy();
 
         choices.forEach((c, i) => {
-            const { name, description, cost } = upgradeDescriptions[i];
+            const { name, description, cost, iconPos } = upgradeDescriptions[i];
             const h1 = c.querySelector("h1");
             const p = c.querySelector("p");
             const costStrong = c.querySelector<HTMLElement>("h3 strong");
+            const icon = c.querySelector<HTMLImageElement>(".upgrade-icon");
 
-            if (!h1 || !p || !costStrong) {
+            if (!h1 || !p || !costStrong || !icon) {
                 throw new Error("Upgrade choice missing elements.");
             }
 
             h1.innerText = name;
             p.innerHTML = description;
             costStrong.innerText = cost.toString();
+            icon.style.backgroundImage = `url(${icons})`;
+            
+            console.log(iconPos);
+            if (iconPos) {
+                icon.style.backgroundPosition = `${iconPos[0]}px ${iconPos[1]}px`;
+            }
         });
 
         this.container.style.opacity = "1.0";
@@ -148,7 +157,7 @@ class UpgradesManager {
         if (!skip) {
             throw new Error("#skip element?");
         }
-        skip.style.color = "white";
+        skip.style.color = "black";
         skip.style.transform = "scale(1.2)";
     }
 
@@ -199,7 +208,7 @@ class UpgradesManager {
                 right = gs.moveVel.x > moveSens;
                 left = gs.moveVel.x < -moveSens;
                 up = gs.moveVel.y > moveSens;
-                down = gs.moveVel.y < -moveSens;
+                down = gs.moveVel.y < -moveSens - 0.1;
                 submit = gs.xDown;
             }
 
