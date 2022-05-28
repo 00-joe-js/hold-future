@@ -54,6 +54,7 @@ import createSpeedFruit, { Item } from "./items/speedFruit";
 import GameTimer from "./gameTimer";
 import upgradesManager from "./upgrades/gui";
 import ProgressBar from "./progressBar";
+import StartEndScreen, { Clippy } from "./startEndScreen";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(80, RESOLUTION, 1, 200000000);
@@ -64,7 +65,18 @@ let protectPause = false;
 
 let loopHooks: Array<(dt: number) => void> = [];
 
-(async () => {
+const HUD = document.querySelector<HTMLElement>("#hud-overlay");
+if (!HUD) throw new Error("HUD.");
+HUD.style.opacity = "1.0";
+
+const startEndScreen = new StartEndScreen();
+const clippy = new Clippy();
+
+startEndScreen.showStartScreen();
+
+const startGame = async () => {
+
+    clippy.hide();
 
     const skybox = await createSkybox();
 
@@ -80,13 +92,10 @@ let loopHooks: Array<(dt: number) => void> = [];
         changeSpeed,
         getSpeed,
         getBaseSpeed,
-        setSpeed,
         grantDecayingSpeedBonus,
-        freezePlayer,
         increaseColliderSize,
         setTrackWallZed
     } = await setupFPSCharacter(camera, scene);
-
 
     loopHooks.push((dt) => {
         if (protectPause) return;
@@ -126,14 +135,12 @@ let loopHooks: Array<(dt: number) => void> = [];
     const baseSpeed = speedInterface.querySelector<HTMLElement>("span strong");
     if (!speedInterface || !baseSpeed || !totalSpeed) throw new Error("Speed interface?");
 
-
     loopHooks.push((dt) => {
         if (Math.random() > .5) {
             totalSpeed.innerText = getSpeed(dt).toFixed(2);
             baseSpeed.innerText = getBaseSpeed().toFixed(0);
         }
     });
-
 
     renderLoop(scene, camera, (dt) => {
 
@@ -173,15 +180,14 @@ let loopHooks: Array<(dt: number) => void> = [];
                 lastRecordedDistance = x;
             });
 
-
             loopHooks.push(dt => {
                 timer.updateCurrentTime(dt);
                 const timeLeft = timer.getTimeLeft();
                 if (timeLeft <= 0) {
                     if (!lost) {
                         lost = true;
-                        alert("Out of time.");
-                        window.location.reload();
+                        pauseRendering();
+                        startEndScreen.showFailedScreen();
                     }
                 }
                 hudTimerEle.innerText = timer.getTimeLeft().toPrecision(4);
@@ -199,7 +205,6 @@ let loopHooks: Array<(dt: number) => void> = [];
             sceneMade = true;
 
             const player = new Player(camera);
-
 
             let onLastGoal = false;
             let won = false;
@@ -219,10 +224,11 @@ let loopHooks: Array<(dt: number) => void> = [];
 
                     if (onLastGoal) {
                         won = true;
-                        alert("You win!");
-                        window.location.reload();
+                        pauseRendering();
+                        startEndScreen.showWinScreen();
+                        return;
                     }
-
+                    
 
                     if (times.length > 0) {
                         const newTime = times.shift();
@@ -333,12 +339,7 @@ let loopHooks: Array<(dt: number) => void> = [];
                 player.faceForward();
             };
 
-
             resetLevel(scene, player, START_TRACK_LENGTH);
-
-            const HUD = document.querySelector<HTMLElement>("#hud-overlay");
-            if (!HUD) throw new Error("HUD.");
-            HUD.style.opacity = "1.0";
 
         }
 
@@ -346,6 +347,15 @@ let loopHooks: Array<(dt: number) => void> = [];
 
     });
 
-})();
+};
 
 
+startEndScreen.registerOnPlayListener(async () => {
+    await startGame();
+    setTimeout(() => {
+        pauseRendering();
+    }, 0);
+    setTimeout(() => {
+        resumeRendering();
+    }, 1000);
+});

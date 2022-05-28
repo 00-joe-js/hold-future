@@ -3,7 +3,6 @@ const container = document.querySelector<HTMLElement>("#upgrades-container");
 
 import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
 
-import clippyGif from "../../assets/testclippy.gif";
 import icons from "../../assets/iconset.jpg";
 
 if (!container) {
@@ -43,18 +42,13 @@ class UpgradesManager {
         moneySlot.innerText = t.toString();
     }
 
-    setClippy() {
-        const clippyImg = this.container.querySelector<HTMLImageElement>("#clippy");
-        if (!clippyImg) throw new Error("I see you're running into an error? :)");
-        clippyImg.src = clippyGif;
-    }
+  
 
     showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onSelection: Function) {
 
         const choices = this.getChoices();
 
         this.setMoney(timeCoins);
-        this.setClippy();
 
         choices.forEach((c, i) => {
             const { name, description, cost, iconPos } = upgradeDescriptions[i];

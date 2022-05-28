@@ -24,6 +24,87 @@ body {
   height: 945px;
 }
 
+#start-end-screen {
+  transition: opacity 0.7s ease-in;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+}
+
+#start-screen,
+#death-screen,
+#win-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 3rem;
+  font-family: monospace;
+  padding-top: 10rem;
+  display: none;
+}
+
+#start-screen {
+  background: rgb(0, 0, 100);
+}
+
+#start-screen h1 {
+  color: white;
+  font-size: 10rem;
+  margin-bottom: 2rem;
+}
+
+#start-screen-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#start-screen-buttons span {
+  display: block;
+  background: rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+#death-screen {
+  padding-top: 0;
+  background: black;
+  justify-content: center;
+}
+
+#death-screen h2 {
+  color: red;
+  font-size: 9rem;
+  border: 1px solid red;
+  padding: 2rem;
+  margin-top: -2rem;
+  margin-bottom: 1rem;
+}
+
+#death-screen h3 {
+  color: white;
+  font-size: 4rem;
+  transition: all 2s linear;
+}
+
+#win-screen {
+  background: rgba(40, 155, 155, 0.9);
+}
+
+#win-screen h2 {
+  color: black;
+}
+
+#win-screen h3 {
+  color: blue;
+  font-size: 4rem;
+  transition: all 2s linear;
+}
+
 #three-canvas-container,
 #three-canvas {
   width: 1680px;
@@ -53,7 +134,7 @@ body {
 #speed {
   position: absolute;
   bottom: -10%;
-  left: 10%;
+  left: 12%;
 
   transform: translate(-50%, -50%);
 
@@ -229,18 +310,30 @@ body {
   margin-top: 4rem;
 }
 
-#control-hint {
-  position: relative;
-  background: rgba(200, 200, 20, 0.9);
-  color: black;
-  font-size: 1.2rem;
-  font-family: monospace;
-  width: 30%;
-  margin-left: auto;
-  padding: 2rem;
+#clippy {
+  position: absolute;
+  bottom: 5%;
+  right: 2%;
+  z-index: 1000;
+  width: 35%;
   display: flex;
 }
 
-#clippy {
-  transform: scale(2);
+#clippy-says {
+  position: relative;
+  background: rgba(200, 200, 20, 0.9);
+  color: black;
+  font-size: 1.3rem;
+  font-family: monospace;
+  font-weight: normal;
+  margin-left: auto;
+  padding: 2rem;
+  margin-right: -2rem;
+  display: flex;
+}
+
+#clippy-img {
+  min-width: 2rem;
+  min-height: 3rem;
+  transform: scale(1.2);
 }

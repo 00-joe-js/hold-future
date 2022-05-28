@@ -33,7 +33,6 @@ export default class ProgressBarInterface {
     }
 
     setVisualProgress() {
-        console.log(this.distanceTraveled);
         const perc = `${this.getProgress().toFixed(2)}%`;
         this.movingBar.style.width = perc;
         this.percentText.innerText = perc;
