@@ -27,7 +27,7 @@ canvasElement.addEventListener("click", () => {
 
 const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
 
-    await gamepad.waitForGamepadConnect();
+    // await gamepad.waitForGamepadConnect();
 
     const keyboard = new Keyboard();
     const mouse = new MouseInterface();
