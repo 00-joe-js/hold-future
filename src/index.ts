@@ -93,7 +93,7 @@ const startGame = async () => {
     let projectGravitasActivated = false;
     let fruitBoost = 10;
     let fruitPerTrack = 50;
-    let chanceForRareFruit = 0.1;
+    let chanceForRareFruit = 0.05;
 
     const {
         gameLoopFn,
@@ -271,7 +271,7 @@ const startGame = async () => {
                                     trackWidth -= 1750;
                                     setTrackWallZed(trackWidth / 2);
                                 } else if (selectedUpgrade.name === "Super Berries") {
-                                    chanceForRareFruit += 0.2;
+                                    chanceForRareFruit += 0.25;
                                 }
                             }
 

@@ -9,9 +9,12 @@ import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
 import { Scene, Camera, Vector2, Color, Vector3, Shader, MathUtils } from "three";
 
+const htmlElement = document.querySelector("html");
+if (htmlElement === null) {
+    throw new Error("Typescript is a lie");
+}
 
 const canvasElement = document.querySelector("#three-canvas");
-
 if (canvasElement === null) {
     throw new Error("Document needs #three-canvas.");
 }
@@ -24,6 +27,15 @@ const composer = new EffectComposer(renderer);
 
 renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
 composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+
+const monitor = document.querySelector<HTMLDivElement>("#virtual-monitor");
+if (!monitor) throw new Error("No monitor for renderer");
+window.addEventListener("resize", () => {
+    renderer.setSize(monitor.clientWidth, monitor.clientHeight);
+    composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+    console.log(window.innerWidth);
+});
+
 renderer.setClearColor(0x000000);
 
 const ColorifyShader = {
@@ -61,8 +73,6 @@ const bloomPass = new UnrealBloomPass(screenRes, 0.7, 0, 0.5);
 const colorifyPass = new ShaderPass(ColorifyShader);
 const copyPass = new ShaderPass(CopyShader);
 
-let calculatedFlashColor: Vector3 = new Vector3();
-
 class FlashCollection {
 
     private lastUsedId: number = 0;
@@ -98,9 +108,7 @@ class FlashCollection {
     }
 
 }
-
 const flashCollection = new FlashCollection();
-
 export const flash = (baseColor: number[], initialLevel: number = 0.25) => {
 
     let flashLevel = initialLevel;
@@ -166,7 +174,6 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
                 deltaTimePaused = null;
             }
             const { x, y, z } = flashCollection.getAllFlashesColor();
-            console.log(x, y, z);
             colorifyPass.uniforms.color.value.setRGB(cFV(x), cFV(y), cFV(z));
 
             onLoop(absoluteCurrentTime - deltaTimePauseOffset);

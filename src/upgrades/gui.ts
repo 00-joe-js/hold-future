@@ -22,11 +22,26 @@ class UpgradesManager {
     private keyboard: KeyboardInterface;
     private cancelListener: boolean = false;
     private hoveredUpgradeIndex: number = 0;
+    private runHueRotation: boolean = false;
     private wantToSkip: boolean = false;
     private container: HTMLElement;
     constructor(domContainer: HTMLElement) {
         this.keyboard = new KeyboardInterface();
         this.container = domContainer;
+
+        const choices = this.getChoices();
+        const icons = Array.from(choices).map(c => {
+            return c.querySelector<HTMLImageElement>(".upgrade-icon");
+        });
+        icons.forEach((i) => {
+            if (i) {
+                setInterval(() => {
+                    if (this.runHueRotation) {
+                        i.style.filter = `hue-rotate(${Math.sin(Date.now() / 5000)}turn)`;
+                    }
+                }, 50);
+            }
+        });
     }
 
     getChoices() {
@@ -42,11 +57,13 @@ class UpgradesManager {
         moneySlot.innerText = t.toString();
     }
 
-  
+
 
     showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onSelection: Function) {
 
         const choices = this.getChoices();
+
+        this.runHueRotation = true;
 
         this.setMoney(timeCoins);
 
@@ -65,7 +82,7 @@ class UpgradesManager {
             p.innerHTML = description;
             costStrong.innerText = cost.toString();
             icon.style.backgroundImage = `url(${icons})`;
-            
+
             if (iconPos) {
                 icon.style.backgroundPosition = `${iconPos[0]}px ${iconPos[1]}px`;
             }
@@ -117,6 +134,7 @@ class UpgradesManager {
     cleanup() {
         this.wantToSkip = false;
         this.hoveredUpgradeIndex = 0;
+        this.runHueRotation = false;
     }
 
     changeSelection(dir: number) {

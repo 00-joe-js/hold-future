@@ -20,12 +20,17 @@ const createAndPlaceSpeedFruit = (
 
     let isRare = false;
     let color = 0x00ff00;
-    let radius = 10 + Math.random() * 20;
+    
+    const randomScalar = Math.random() * 30;
+
+    let radius = 10 + randomScalar;
+    let baseSpeed = 1 + ((randomScalar / 30) * .5);
 
     if (Math.random() < rareChance) {
         isRare = true;
         color = 0xffaaee;
         radius = radius * 4;
+        baseSpeed = baseSpeed * 5;
     }
 
     const group = new Group();
@@ -49,7 +54,7 @@ const createAndPlaceSpeedFruit = (
         onPlayerCollide: () => {
             if (!rewarded) {
                 rewarded = true;
-                increaseSpeed(isRare ? 5 : 1.25);
+                increaseSpeed(baseSpeed);
                 if (isRare) {
                     /// 0xffaaee
                     flash([1, 0.67, 0.93], 0.15);
