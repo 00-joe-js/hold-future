@@ -21,7 +21,6 @@ rareFruitBackup.volume = 0.1;
 rareFruitThird.volume = 0.1;
 rareFruitFourth.volume = 0.1;
 
-
 moan.volume = 0.6;
 screenOpen.volume = 0.7;
 
@@ -34,8 +33,14 @@ click.addEventListener("canplaythrough", () => {
     canPlay = true;
 });
 
+let clickPlayedOnce = false;
 export const playClick = () => {
     if (canPlay) {
+        if (!clickPlayedOnce) {
+            clickPlayedOnce = true;
+            click.play();
+            return;
+        }
         if (!click.ended) {
             backupClick.play();
         }
@@ -55,8 +60,14 @@ export const playScreenOpen = () => {
     }
 };
 
+let rareFruitPlayedOnce = false;
 export const playRareFruit = () => {
     if (canPlay) {
+        if (!rareFruitPlayedOnce) {
+            rareFruitPlayedOnce = true;
+            rareFruit.play();
+            return;
+        }
         if (!rareFruit.ended) {
             if (!rareFruitBackup.ended) {
                 if (!rareFruitThird.ended) {

@@ -102,7 +102,6 @@ class UpgradesManager {
                         if (upgrade.cost >= timeCoins) {
                             return;
                         }
-
                         onSelection(this.hoveredUpgradeIndex);
                         this.cleanup();
                     }
@@ -117,7 +116,6 @@ class UpgradesManager {
 
     cleanup() {
         this.wantToSkip = false;
-        this.unhighlightSkip();
         this.hoveredUpgradeIndex = 0;
     }
 

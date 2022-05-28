@@ -4,11 +4,10 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
-// import { ColorifyShader } from "three/examples/jsm/shaders/ColorifyShader";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 
 
-import { Scene, Camera, Vector2, Color, Vector3, Shader } from "three";
+import { Scene, Camera, Vector2, Color, Vector3, Shader, MathUtils } from "three";
 
 
 const canvasElement = document.querySelector("#three-canvas");
@@ -62,37 +61,65 @@ const bloomPass = new UnrealBloomPass(screenRes, 0.7, 0, 0.5);
 const colorifyPass = new ShaderPass(ColorifyShader);
 const copyPass = new ShaderPass(CopyShader);
 
-let currentGreenFlash: number | undefined = undefined;
-export const flashGreen = () => {
+let calculatedFlashColor: Vector3 = new Vector3();
 
-    if (flashTealInterval) return;
+class FlashCollection {
 
-    if (currentGreenFlash) {
-        clearInterval(currentGreenFlash);
+    private lastUsedId: number = 0;
+    private flashes: { [id: number]: Vector3 } = {};
+    private outputVector: Vector3 = new Vector3();
+
+    addNewFlash(currentColor: Vector3) {
+        const id = this.lastUsedId + 1;
+        this.lastUsedId = id;
+        this.flashes[id] = currentColor;
+        return id;
     }
 
-    let flashLevel = 0.02;
-    currentGreenFlash = setInterval(() => {
-        colorifyPass.uniforms.color.value.setRGB(0, flashLevel, 0);
-        flashLevel = flashLevel - 0.001;
-        if (flashLevel <= 0) {
-            clearInterval(currentGreenFlash);
+    setFlashValue(id: number, value: Vector3) {
+        if (this.flashes[id]) {
+            this.flashes[id].copy(value);
+        } else {
+            throw new Error(`Bad id given ${id}`);
         }
-    }, 16);
+    }
 
-};
+    removeFlash(id: number) {
+        delete this.flashes[id];
+    }
 
-let flashTealInterval: number | null = null;
-export const flashTeal = () => {
+    getAllFlashesColor(): Vector3 {
+        const o = this.outputVector;
+        o.set(0, 0, 0);
+        Object.values(this.flashes).forEach(f => {
+            o.set(o.x + f.x, o.y + f.y, o.z + f.z);
+        });
+        return o;
+    }
 
-    let flashLevel = 0.2;
-    flashTealInterval = setInterval(() => {
-        colorifyPass.uniforms.color.value.setRGB(0, flashLevel, flashLevel);
-        flashLevel = flashLevel - 0.001;
+}
+
+const flashCollection = new FlashCollection();
+
+export const flash = (baseColor: number[], initialLevel: number = 0.25) => {
+
+    let flashLevel = initialLevel;
+
+    const colorV = new Vector3();
+    colorV.set(baseColor[0], baseColor[1], baseColor[2]);
+    colorV.multiplyScalar(flashLevel);
+
+    const flashId = flashCollection.addNewFlash(colorV);
+
+    const interval = setInterval(() => {
+        colorV.set(baseColor[0], baseColor[1], baseColor[2]);
+        colorV.multiplyScalar(flashLevel);
+        flashCollection.setFlashValue(flashId, colorV);
+        flashLevel = flashLevel - 0.003;
         if (flashLevel <= 0) {
-            if (flashTealInterval) {
-                clearInterval(flashTealInterval);
-                flashTealInterval = null;
+            if (interval) {
+                flashCollection.removeFlash(flashId);
+                clearInterval(interval);
             }
         }
     }, 16);
@@ -119,6 +146,10 @@ export const resumeRendering = () => {
 export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) => void) => {
 
     colorifyPass.uniforms.color.value.setRGB(0, 0, 0);
+    // Clamp flash value.
+    const cFV = (v: number) => {
+        return MathUtils.clamp(v, 0, 0.15);
+    };
 
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(colorifyPass);
@@ -131,10 +162,13 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
         window.requestAnimationFrame(internalLoop);
         if (!renderPaused) {
             if (deltaTimePaused !== null) {
-                console.log(`Adding ${absoluteCurrentTime - deltaTimePaused} (${deltaTimePaused}, ${absoluteCurrentTime})`);
                 deltaTimePauseOffset += absoluteCurrentTime - deltaTimePaused;
                 deltaTimePaused = null;
             }
+            const { x, y, z } = flashCollection.getAllFlashesColor();
+            console.log(x, y, z);
+            colorifyPass.uniforms.color.value.setRGB(cFV(x), cFV(y), cFV(z));
+
             onLoop(absoluteCurrentTime - deltaTimePauseOffset);
             composer.render();
         } else {

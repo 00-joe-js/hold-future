@@ -1,6 +1,6 @@
 import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial, SphereGeometry, IcosahedronGeometry } from "three";
 
-import { flashGreen } from "../renderer/index";
+import { flash } from "../renderer/index";
 
 import { playClick, playRareFruit } from "../sound";
 
@@ -50,10 +50,12 @@ const createAndPlaceSpeedFruit = (
             if (!rewarded) {
                 rewarded = true;
                 increaseSpeed(isRare ? 5 : 1.25);
-                flashGreen();
                 if (isRare) {
+                    /// 0xffaaee
+                    flash([1, 0.67, 0.93], 0.15);
                     playRareFruit();
                 } else {
+                    flash([0, 1, 0], 0.05);
                     playClick();
                 }
             }

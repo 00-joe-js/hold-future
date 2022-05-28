@@ -1,11 +1,11 @@
 import "./style.css";
 
 import { Scene, PerspectiveCamera, AmbientLight, Color, Vector3, Group, _SRGBAFormat } from "three";
-import { flashTeal, pauseRendering, resumeRendering } from "./renderer/index";
+import { flash, pauseRendering, resumeRendering } from "./renderer/index";
 
 import { gamepad } from "./firstPersonCharacter/inputHelper";
 
-import {playBgMusic, playScreenOpen} from "./sound";
+import { playBgMusic, playScreenOpen } from "./sound";
 
 
 /* GLOBALS */
@@ -282,7 +282,9 @@ const startGame = async () => {
                                 const newTrackLength = 100000;
                                 resetLevel(scene, player, newTrackLength);
                                 setTrackDimensions(newTrackLength, trackWidth);
-                                flashTeal();
+                                setTimeout(() => {
+                                    flash([0, 1, 1], 0.3);
+                                }, 100);
                             }, 200);
                         });
                     } else {
