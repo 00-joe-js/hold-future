@@ -5,6 +5,8 @@ import { flashTeal, pauseRendering, resumeRendering } from "./renderer/index";
 
 import { gamepad } from "./firstPersonCharacter/inputHelper";
 
+import {playBgMusic, playScreenOpen} from "./sound";
+
 
 /* GLOBALS */
 declare global {
@@ -79,6 +81,8 @@ const startGame = async () => {
     clippy.hide();
 
     const skybox = await createSkybox();
+
+    playBgMusic();
 
     // UPGRADE VALUES other than SPEED.
     let trackWidth = 5000;
@@ -228,13 +232,13 @@ const startGame = async () => {
                         startEndScreen.showWinScreen();
                         return;
                     }
-                    
+
 
                     if (times.length > 0) {
                         const newTime = times.shift();
                         newTime && timer.grantMoreTime(newTime);
-                        flashTeal();
                         pauseRendering();
+                        playScreenOpen();
                         upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(), (selected: number) => {
 
                             if (selected === -1) {
@@ -271,6 +275,7 @@ const startGame = async () => {
                                 const newTrackLength = 100000;
                                 resetLevel(scene, player, newTrackLength);
                                 setTrackDimensions(newTrackLength, trackWidth);
+                                flashTeal();
                             }, 200);
                         });
                     } else {

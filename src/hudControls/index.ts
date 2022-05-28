@@ -73,7 +73,7 @@ const listenForInputEvents = (fn: (i: string) => void) => {
             selectedTriggered = true;
             setTimeout(() => {
                 selectedTriggered = false;
-            }, 1000);
+            }, 500);
         }
     };
     window.requestAnimationFrame(listening);

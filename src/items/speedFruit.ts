@@ -2,6 +2,9 @@ import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial }
 
 import { flashGreen } from "../renderer/index";
 
+import {playClick} from "../sound";
+
+
 export interface Item {
     obj: Group,
     collidingObj: Mesh,
@@ -40,6 +43,7 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
                 rewarded = true;
                 increaseSpeed(1.25);
                 flashGreen();
+                playClick();
                 pleaseDestroy(group);
             }
         }
