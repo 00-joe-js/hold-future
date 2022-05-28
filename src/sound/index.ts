@@ -54,6 +54,17 @@ export const playBgMusic = () => {
     }
 };
 
+export const stopBgMusic = () => {
+    const fadingInterval = setInterval(() => {
+        moan.volume -= 0.05;
+        if (moan.volume <= 0) {
+            moan.pause();
+            moan.volume = 0.6;
+            clearInterval(fadingInterval);
+        }
+    }, 20);
+};
+
 export const playScreenOpen = () => {
     if (canPlay) {
         screenOpen.play();

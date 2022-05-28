@@ -5,6 +5,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
+import { VerticalBlurShader } from "three/examples/jsm/shaders/VerticalBlurShader.js"
 
 
 import { Scene, Camera, Vector2, Color, Vector3, Shader, MathUtils } from "three";
@@ -33,7 +34,8 @@ if (!monitor) throw new Error("No monitor for renderer");
 window.addEventListener("resize", () => {
     renderer.setSize(monitor.clientWidth, monitor.clientHeight);
     composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
-    console.log(window.innerWidth);
+    blurUniforms.resolution.value = new Vector2(window.innerWidth, window.innerHeight);
+    blurUniforms.center.value = blurUniforms.resolution.value.clone().multiplyScalar(0.5);
 });
 
 renderer.setClearColor(0x000000);
@@ -49,7 +51,6 @@ const ColorifyShader = {
     		vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-
     fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
@@ -68,10 +69,32 @@ const ColorifyShader = {
 		}`
 };
 
+import { vShader, fShader } from "./blur-shader";
+
+const blurUniforms = {
+    "tDiffuse": { value: null },
+    "strength": { value: 0.01 },
+    "center": { value: new Vector2(window.innerWidth * 0.5, window.innerHeight * 0.5) },
+    "resolution": { value: new Vector2(window.innerWidth, window.innerHeight) }
+};
+
+const BlurShader = {
+    vertexShader: vShader,
+    fragmentShader: fShader,
+    uniforms: blurUniforms
+};
+
 const screenRes = new Vector2(canvasElement.clientWidth, canvasElement.clientHeight);
 const bloomPass = new UnrealBloomPass(screenRes, 0.7, 0, 0.5);
 const colorifyPass = new ShaderPass(ColorifyShader);
+const blurPass = new ShaderPass(BlurShader);
 const copyPass = new ShaderPass(CopyShader);
+
+let blurLevel = 0.01;
+export const setBlurLevel = (level: number) => {
+    blurLevel = level * 0.1;
+};
+
 
 class FlashCollection {
 
@@ -104,7 +127,12 @@ class FlashCollection {
         Object.values(this.flashes).forEach(f => {
             o.set(o.x + f.x, o.y + f.y, o.z + f.z);
         });
+        o.set(this.clampFlashValue(o.x), this.clampFlashValue(o.y), this.clampFlashValue(o.z));
         return o;
+    }
+
+    private clampFlashValue(v: number) {
+        return MathUtils.clamp(v, 0, 0.15);
     }
 
 }
@@ -154,17 +182,18 @@ export const resumeRendering = () => {
 export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) => void) => {
 
     colorifyPass.uniforms.color.value.setRGB(0, 0, 0);
-    // Clamp flash value.
-    const cFV = (v: number) => {
-        return MathUtils.clamp(v, 0, 0.15);
-    };
 
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(colorifyPass);
     composer.addPass(bloomPass);
+    composer.addPass(blurPass);
     composer.addPass(copyPass);
 
     copyPass.renderToScreen = true;
+
+    setTimeout(() => {
+        setBlurLevel(1);
+    }, 5000);
 
     const internalLoop = (absoluteCurrentTime: number) => {
         window.requestAnimationFrame(internalLoop);
@@ -174,7 +203,9 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
                 deltaTimePaused = null;
             }
             const { x, y, z } = flashCollection.getAllFlashesColor();
-            colorifyPass.uniforms.color.value.setRGB(cFV(x), cFV(y), cFV(z));
+            colorifyPass.uniforms.color.value.setRGB(x, y, z);
+
+            blurPass.uniforms.strength.value = blurLevel;
 
             onLoop(absoluteCurrentTime - deltaTimePauseOffset);
             composer.render();

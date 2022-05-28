@@ -153,6 +153,11 @@ body {
   opacity: 0;
 }
 
+#hud-stats {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
 #speed {
   position: absolute;
   bottom: -10%;
@@ -317,7 +322,7 @@ body {
   width: 35px;
   height: 35px;
   transform: scale(2);
-  background-position: -272px -405px;
+  background-position: -420px -257px;
   filter: hue-rotate(0.5turn);
 }
 

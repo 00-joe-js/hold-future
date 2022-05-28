@@ -408,6 +408,9 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         getBaseSpeed() {
             return SPEED;
         },
+        getBonusSpeed(dt: number) {
+            return calculateSpeedBonuses(dt);
+        },
         changeSpeed(d: number) {
             SPEED += d;
             return SPEED;

@@ -24,13 +24,13 @@ const createAndPlaceSpeedFruit = (
     const randomScalar = Math.random() * 30;
 
     let radius = 10 + randomScalar;
-    let baseSpeed = 1 + ((randomScalar / 30) * .5);
+    let baseSpeed = 1 + ((randomScalar / 30) * .2);
 
     if (Math.random() < rareChance) {
         isRare = true;
         color = 0xffaaee;
         radius = radius * 4;
-        baseSpeed = baseSpeed * 5;
+        baseSpeed = baseSpeed * 3;
     }
 
     const group = new Group();

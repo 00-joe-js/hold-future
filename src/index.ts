@@ -1,7 +1,7 @@
 import "./style.css";
 
-import { Scene, PerspectiveCamera, AmbientLight, Color, Vector3, Group, _SRGBAFormat } from "three";
-import { flash, pauseRendering, resumeRendering } from "./renderer/index";
+import { Scene, PerspectiveCamera, AmbientLight, Color, Vector3, Group, _SRGBAFormat, MathUtils } from "three";
+import { flash, pauseRendering, resumeRendering, setBlurLevel } from "./renderer/index";
 
 import { gamepad } from "./firstPersonCharacter/inputHelper";
 
@@ -39,12 +39,14 @@ function shuffleArray(array: Array<any>) {
     return array;
 }
 
-const getRandomUpgrades = () => {
+const getRandomUpgrades = (discount: number) => {
     const alwaysPick = TEST_UPGRADES.find(u => u.alwaysPick);
     if (alwaysPick) {
         return [alwaysPick, alwaysPick, alwaysPick];
     }
-    return shuffleArray(TEST_UPGRADES).slice(0, 3);
+    return shuffleArray(TEST_UPGRADES).slice(0, 3).map(u => (
+        { ...u, cost: u.cost - discount }
+    ));
 };
 
 import { renderLoop } from "./renderer";
@@ -73,6 +75,8 @@ let loopHooks: Array<(dt: number) => void> = [];
 
 const HUD = document.querySelector<HTMLElement>("#hud-overlay");
 if (!HUD) throw new Error("HUD.");
+const HUD_STATS = document.querySelector<HTMLElement>("#hud-stats");
+if (!HUD_STATS) throw new Error("HUD stats.");
 HUD.style.opacity = "1.0";
 
 const startEndScreen = new StartEndScreen();
@@ -94,6 +98,7 @@ const startGame = async () => {
     let fruitBoost = 10;
     let fruitPerTrack = 50;
     let chanceForRareFruit = 0.05;
+    let upgradeDiscount = 0;
 
     const {
         gameLoopFn,
@@ -101,6 +106,7 @@ const startGame = async () => {
         changeSpeed,
         getSpeed,
         getBaseSpeed,
+        getBonusSpeed,
         grantDecayingSpeedBonus,
         increaseColliderSize,
         setTrackWallZed
@@ -145,6 +151,8 @@ const startGame = async () => {
     if (!speedInterface || !baseSpeed || !totalSpeed) throw new Error("Speed interface?");
 
     loopHooks.push((dt) => {
+        const bl = getBonusSpeed(dt) / 75;
+        setBlurLevel(bl);
         if (Math.random() > .5) {
             totalSpeed.innerText = getSpeed(dt).toFixed(2);
             baseSpeed.innerText = getBaseSpeed().toFixed(0);
@@ -244,34 +252,37 @@ const startGame = async () => {
                         newTime && timer.grantMoreTime(newTime);
                         pauseRendering();
                         playScreenOpen();
-                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(), (selected: number) => {
+                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(upgradeDiscount), (selected: number) => {
 
                             if (selected === -1) {
                                 // Skip.
                             } else {
                                 const selectedUpgrade = TEST_UPGRADES[selected];
+                                const upgradeName = selectedUpgrade.name;
 
                                 timer.deductTime(selectedUpgrade.cost);
 
-                                if (selectedUpgrade.name === "Project Gravitas") {
+                                if (upgradeName === "Project Gravitas") {
                                     projectGravitasActivated = true;
-                                } else if (selectedUpgrade.name === "The Juice.") {
+                                } else if (upgradeName === "The Juice.") {
                                     changeSpeed(5);
-                                } else if (selectedUpgrade.name === "Hello, Neighbor!") {
-                                    increaseColliderSize(200);
-                                } else if (selectedUpgrade.name === "Extra Juicy!") {
+                                } else if (upgradeName === "Hello, Neighbor!") {
+                                    increaseColliderSize(150);
+                                } else if (upgradeName === "Extra Juicy!") {
                                     changeSpeed(20);
-                                } else if (selectedUpgrade.name === "Boost Fruit") {
-                                    fruitBoost += 10;
-                                } else if (selectedUpgrade.name === "MORE Fruit") {
-                                    fruitPerTrack += 50;
-                                } else if (selectedUpgrade.name === "LOADS of Fruit") {
-                                    fruitPerTrack += 300;
-                                } else if (selectedUpgrade.name === "Optic Fiber") {
+                                } else if (upgradeName === "Boost Fruit") {
+                                    fruitBoost += 5;
+                                } else if (upgradeName === "MORE Fruit") {
+                                    fruitPerTrack += 30;
+                                } else if (upgradeName === "LOADS of Fruit") {
+                                    fruitPerTrack += 200;
+                                } else if (upgradeName === "Optic Fiber") {
                                     trackWidth -= 1750;
                                     setTrackWallZed(trackWidth / 2);
-                                } else if (selectedUpgrade.name === "Super Berries") {
-                                    chanceForRareFruit += 0.25;
+                                } else if (upgradeName === "Super Berries") {
+                                    chanceForRareFruit += 0.2;
+                                } else if (upgradeName === "Limited-Time Offer") {
+                                    upgradeDiscount += 5;
                                 }
                             }
 
@@ -307,6 +318,14 @@ const startGame = async () => {
                 }
 
                 const randomPoints = [];
+
+                const randZ = (trackWidth: number) => {
+                    const column = MathUtils.randInt(0, 8);
+                    const segmentWidth = trackWidth / 20;
+                    const sign = Math.random() < 0.5 ? 1 : -1;
+                    return column * sign * segmentWidth;
+                };
+
                 for (let i = 0; i < fruitPerTrack; i++) {
                     let y = 0;
                     if (projectGravitasActivated) {
@@ -318,7 +337,7 @@ const startGame = async () => {
                     randomPoints.push(new Vector3(
                         Math.random() * (trackLength),
                         y,
-                        (Math.random() - 0.5) * (trackWidth - (trackWidth / 5))
+                        randZ(trackWidth)
                     ));
                 }
 
@@ -358,6 +377,8 @@ const startGame = async () => {
         }
 
         loopHooks.forEach(fn => fn(dt));
+
+        HUD_STATS.style.opacity = "1.0";
 
     });
 

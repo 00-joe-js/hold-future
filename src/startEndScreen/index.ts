@@ -6,6 +6,8 @@ import brokenLoader from "../../assets/badloader.gif";
 
 import listenForInputEvents from "../hudControls";
 
+import {stopBgMusic} from "../sound";
+
 class StartEndScreen {
 
     private container: HTMLDivElement;
@@ -89,6 +91,7 @@ class StartEndScreen {
         if (!killContainer) throw new Error("Missing death screen.");
         const badLoaderImg = killContainer.querySelector("img");
         if (!badLoaderImg) throw new Error("No broken loader image");
+        stopBgMusic();
         badLoaderImg.src = brokenLoader;
         killContainer.style.display = "flex";
         this.container.style.opacity = "1.0";
