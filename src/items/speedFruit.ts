@@ -1,9 +1,8 @@
-import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial } from "three";
+import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial, SphereGeometry, IcosahedronGeometry } from "three";
 
 import { flashGreen } from "../renderer/index";
 
-import {playClick} from "../sound";
-
+import { playClick, playRareFruit } from "../sound";
 
 export interface Item {
     obj: Group,
@@ -12,21 +11,30 @@ export interface Item {
     onPlayerCollide: () => void
 }
 
-const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => void, pleaseDestroy: (g: Group) => void): Item => {
+const createAndPlaceSpeedFruit = (
+    rareChance: number, 
+    pos: Vector3, 
+    increaseSpeed: (d: number) => void, 
+    pleaseDestroy: (g: Group) => void
+): Item => {
 
-    const COLOR = 0x00ff00;
+    let isRare = false;
+    let color = 0x00ff00;
+    let radius = 10 + Math.random() * 20;
+
+    if (Math.random() < rareChance) {
+        isRare = true;
+        color = 0xffaaee;
+        radius = radius * 4;
+    }
 
     const group = new Group();
 
-    const cylinderGeo = new CylinderGeometry(20, 20, 80);
-    const cylinder = new Mesh(cylinderGeo, new MeshBasicMaterial({ color: COLOR }));
-
-    // const light = new PointLight(COLOR, 2);
-    // light.position.y = -500;
-    // group.add(light);
+    const fruitGeo = new IcosahedronGeometry(radius, 1);
+    const cylinder = new Mesh(fruitGeo, new MeshBasicMaterial({ color }));
 
     group.add(cylinder);
-    
+
     group.position.copy(pos);
 
     let rewarded = false;
@@ -41,10 +49,13 @@ const createAndPlaceSpeedFruit = (pos: Vector3, increaseSpeed: (d: number) => vo
         onPlayerCollide: () => {
             if (!rewarded) {
                 rewarded = true;
-                increaseSpeed(1.25);
+                increaseSpeed(isRare ? 5 : 1.25);
                 flashGreen();
-                playClick();
-                pleaseDestroy(group);
+                if (isRare) {
+                    playRareFruit();
+                } else {
+                    playClick();
+                }
             }
         }
     };

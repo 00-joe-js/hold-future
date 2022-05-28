@@ -40,6 +40,10 @@ function shuffleArray(array: Array<any>) {
 }
 
 const getRandomUpgrades = () => {
+    const alwaysPick = TEST_UPGRADES.find(u => u.alwaysPick);
+    if (alwaysPick) {
+        return [alwaysPick, alwaysPick, alwaysPick];
+    }
     return shuffleArray(TEST_UPGRADES).slice(0, 3);
 };
 
@@ -89,6 +93,7 @@ const startGame = async () => {
     let projectGravitasActivated = false;
     let fruitBoost = 10;
     let fruitPerTrack = 50;
+    let chanceForRareFruit = 0.1;
 
     const {
         gameLoopFn,
@@ -265,6 +270,8 @@ const startGame = async () => {
                                 } else if (selectedUpgrade.name === "Optic Fiber") {
                                     trackWidth -= 1750;
                                     setTrackWallZed(trackWidth / 2);
+                                } else if (selectedUpgrade.name === "Super Berries") {
+                                    chanceForRareFruit += 0.2;
                                 }
                             }
 
@@ -313,7 +320,7 @@ const startGame = async () => {
                     ));
                 }
 
-                items = randomPoints.map(pt => createSpeedFruit(pt, (moreSpeed: number) => {
+                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, pt, (moreSpeed: number) => {
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 2000, globalTime.getTime());
                     changeSpeed(moreSpeed / 5);
                     setGoalBrightness(0.4);

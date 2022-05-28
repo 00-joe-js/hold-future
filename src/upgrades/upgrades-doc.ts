@@ -46,5 +46,11 @@ export default [
         description: `<strong>The track becomes narrower.</strong> You can't fall off of a wire! Also, it puts all the fruit together.`,
         cost: 5,
         iconPos: [-420, -220]
+    },
+    {
+        name: "Super Berries",
+        description: `<strong>You encounter more rare speed fruit</strong>. Extra chance for extra delicious!`,
+        cost: 10,
+        iconPos: [-272, -405]
     }
 ];
