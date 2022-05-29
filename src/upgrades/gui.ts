@@ -21,7 +21,17 @@ interface Upgrade {
     iconPos?: number[]
 }
 
-const clippyUpgradeSayings = [
+function shuffleArray(array: Array<any>) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+const clippyUpgradeSayings = shuffleArray([
     `Ah, the trusty upgrade screen ... Choose wisely, \${filename}!`,
     `Some upgrades are better earlier. Others are better later.`,
     `Very expensive upgrades are usually very powerful. Buy them when you have a lot of extra time!`,
@@ -36,7 +46,7 @@ const clippyUpgradeSayings = [
     `It seems you are having no trouble selecting an upgrade.`,
     `Jumping can help you get delicious fruit when it counts!`,
     `Yum.`
-];
+]);
 
 
 class UpgradesManager {
@@ -87,8 +97,8 @@ class UpgradesManager {
 
         this.setMoney(timeCoins);
 
-        if (Math.random() > .7) {
-            clippy.setText(clippyUpgradeSayings[MathUtils.randInt(0, clippyUpgradeSayings.length - 1)]);
+        if (Math.random() > .55) {
+            clippy.setText(clippyUpgradeSayings.shift());
             setTimeout(() => {
                 clippy.show();
             }, 1000);

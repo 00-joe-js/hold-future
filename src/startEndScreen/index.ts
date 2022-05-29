@@ -195,7 +195,7 @@ class Clippy {
     private setClippy() {
         const clippyImg = document.querySelector<HTMLImageElement>("#clippy-img");
         if (!clippyImg) throw new Error("I see you're running into an error? :)");
-        clippyImg.src = clippyGif;
+        clippyImg.style.backgroundImage = `url(${clippyGif})`;
     }
 }
 

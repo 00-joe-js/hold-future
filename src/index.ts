@@ -171,9 +171,6 @@ const startGame = async () => {
             const hudTimerEle = document.querySelector<HTMLElement>("#hud-time");
             if (!hudTimerEle) throw new Error("No #hud-time");
 
-            const hudDistanceToGoal = document.querySelector<HTMLElement>("#hud-goal-distance");
-            if (!hudDistanceToGoal) throw new Error("No #hud-goal-distance");
-
             const totalRunTime = 120;
             // 7 15s to work with
 

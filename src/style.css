@@ -46,6 +46,8 @@ body {
   height: calc(80vw * 9/16);
 }
 
+
+
 #virtual-monitor {
   position: relative;
 }
@@ -161,7 +163,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: -1;
   box-sizing: content-box;
 }
 
@@ -383,8 +385,10 @@ body {
 }
 
 #clippy-img {
-  width: 7rem;
+  width: 12rem;
+  height: 18rem;
   position: relative;
-  top: 5px;
-  left: 20px;
+  background-size: 300%;
+  top: 4rem;
+  left: -0.5rem;
 }
