@@ -273,7 +273,7 @@ const startGame = async () => {
                                 } else if (upgradeName === "Hello, Neighbor!") {
                                     increaseColliderSize(150);
                                 } else if (upgradeName === "Extra Juicy!") {
-                                    changeSpeed(20);
+                                    changeSpeed(15);
                                 } else if (upgradeName === "Boost Fruit") {
                                     fruitBoost += 10;
                                 } else if (upgradeName === "MORE Fruit") {
@@ -289,7 +289,7 @@ const startGame = async () => {
                                     upgradeDiscount += 5;
                                 } else if (upgradeName === "Sustainability") {
                                     fruitBoost -= 5;
-                                    portionForBaseSpeed += 0.4;
+                                    portionForBaseSpeed += 0.2;
                                 }
                             }
 
@@ -349,13 +349,12 @@ const startGame = async () => {
                 }
 
                 items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, pt, (moreSpeed: number) => {
-                    console.log(moreSpeed, fruitBoost, portionForBaseSpeed);
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
                     changeSpeed(moreSpeed * portionForBaseSpeed);
-                    setGoalBrightness(0.4);
+                    setGoalBrightness(0.55 * (1.0 - (camera.position.x / goal.position.x)));
                     setTimeout(() => {
                         setGoalBrightness(0.0);
-                    }, 300);
+                    }, 500);
                 }, (group: Group) => {
                     requestAnimationFrame(() => {
                         scene.remove(group);

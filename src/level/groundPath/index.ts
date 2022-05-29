@@ -49,7 +49,7 @@ export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
         fragmentShader: goalFShader
     });
 
-    const goalG = new BoxGeometry(trackLength, 30000, trackWidth, 1, 1, 1);
+    const goalG = new BoxGeometry(trackLength, 30000, trackWidth, 15, 15, 15);
     const goal = new Mesh(goalG, goalMat);
 
     goal.rotation.y = Math.PI / 2;

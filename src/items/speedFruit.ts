@@ -57,10 +57,10 @@ const createAndPlaceSpeedFruit = (
                 increaseSpeed(baseSpeed);
                 if (isRare) {
                     /// 0xffaaee
-                    flash([1, 0.67, 0.93], 0.15);
+                    flash([1, 0.6, 0.9], 0.1);
                     playRareFruit();
                 } else {
-                    flash([0, 1, 0], 0.05);
+                    flash([0, 1, 0], 0.03);
                     playClick();
                 }
             }
