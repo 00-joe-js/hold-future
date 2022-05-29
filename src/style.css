@@ -361,7 +361,8 @@ body {
 }
 
 #clippy-img {
-  min-width: 2rem;
-  min-height: 3rem;
-  transform: scale(1.2);
+  width: 10rem;
+  position: relative;
+  top: 5px;
+  left: 20px;
 }

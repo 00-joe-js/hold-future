@@ -1,4 +1,4 @@
-import clippyGif from "../../assets/testclippy.gif";
+import clippyGif from "../../assets/blippy.png";
 
 import winGif from "../../assets/kid-thumbs-up.gif";
 
