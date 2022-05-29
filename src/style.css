@@ -70,7 +70,7 @@ body {
   align-items: center;
   font-size: 3rem;
   font-family: monospace;
-  padding-top: 10rem;
+  padding-top: 3rem;
   display: none;
 }
 
@@ -80,8 +80,8 @@ body {
 
 #start-screen h1 {
   color: white;
-  font-size: 10rem;
-  margin-bottom: 2rem;
+  font-size: 8rem;
+  margin-bottom: 7rem;
 }
 
 #start-screen-buttons {
@@ -322,7 +322,7 @@ body {
   width: 35px;
   height: 35px;
   transform: scale(2);
-  background-position: -125px -479px;
+  background-position: -456px -35px;
   filter: hue-rotate(0.5turn);
 }
 
@@ -343,7 +343,7 @@ body {
   bottom: 5%;
   right: 2%;
   z-index: 1000;
-  width: 35%;
+  width: 55%;
   display: flex;
 }
 

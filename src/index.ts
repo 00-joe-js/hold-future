@@ -104,6 +104,7 @@ const startGame = async () => {
     let portionForBaseSpeed = 0.2;
     let upgradeDiscount = 0;
     let fruitRadius = 15;
+    let randomFruitColors = false;
 
     const {
         gameLoopFn,
@@ -291,6 +292,10 @@ const startGame = async () => {
                                 } else if (upgradeName === "Sustainability") {
                                     fruitBoost -= 5;
                                     portionForBaseSpeed += 0.4;
+                                } else if (upgradeName === "Jacked Fruit") {
+                                    fruitRadius += 50;
+                                } else if (upgradeName === "Paint") {
+                                    randomFruitColors = true;
                                 }
                             }
 
@@ -347,7 +352,7 @@ const startGame = async () => {
                     ));
                 }
 
-                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, fruitRadius, pt, (moreSpeed: number) => {
+                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, fruitRadius, randomFruitColors, pt, (moreSpeed: number) => {
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
                     changeSpeed(moreSpeed * portionForBaseSpeed);
                 }, (group: Group) => {

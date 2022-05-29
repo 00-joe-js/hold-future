@@ -92,7 +92,7 @@ const copyPass = new ShaderPass(CopyShader);
 
 let blurLevel = 0.01;
 export const setBlurLevel = (level: number) => {
-    blurLevel = level * 0.15 ;
+    blurLevel = level * 0.15  ;
 };
 
 

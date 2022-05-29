@@ -65,5 +65,17 @@ export default [
         description: `Speed fruit grants <strong>more base speed but slightly less boost</strong>.`,
         cost: 5,
         iconPos: [-125, -479]
+    },
+    {
+        name: "Jacked Fruit",
+        description: `<strong>Speed fruit is bigger</strong>. The bigger it is, the easier it is to eat!`,
+        cost: 5,
+        iconPos: [-198, -35],
+    },
+    {
+        name: "Paint",
+        description: `<strong>Super berries</strong> give more speed, but they become <strong>indistinguishable from all super fruit</strong>.`,
+        cost: 0,
+        iconPos: [-456, -35]
     }
 ];

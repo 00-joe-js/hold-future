@@ -1,4 +1,4 @@
-import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial, SphereGeometry, IcosahedronGeometry } from "three";
+import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial, SphereGeometry, IcosahedronGeometry, MathUtils, Color } from "three";
 
 import { flash } from "../renderer/index";
 
@@ -14,14 +14,15 @@ export interface Item {
 const createAndPlaceSpeedFruit = (
     rareChance: number,
     baseRadius: number = 15,
+    randomColor: boolean = false,
     pos: Vector3,
-    increaseSpeed: (d: number) => void, 
+    increaseSpeed: (d: number) => void,
     pleaseDestroy: (g: Group) => void
 ): Item => {
 
     let isRare = false;
     let color = 0x00ff00;
-    
+
     const randomScalar = Math.random() * 30;
 
     let radius = baseRadius + randomScalar;
@@ -30,9 +31,18 @@ const createAndPlaceSpeedFruit = (
     if (Math.random() < rareChance) {
         isRare = true;
         color = 0xffaaee;
-        radius = radius * 4;
-        baseSpeed = baseSpeed * 3;
+        if (!randomColor) {
+            radius = radius * 4;
+            baseSpeed = baseSpeed * 3;
+        } else {
+            baseSpeed = baseSpeed * 3 * 2;
+        }
     }
+
+    if (randomColor) {
+        color = MathUtils.randInt(0, 16777215);
+    }
+
 
     const group = new Group();
 
