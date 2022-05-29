@@ -6,7 +6,7 @@ import brokenLoader from "../../assets/badloader.gif";
 
 import listenForInputEvents from "../hudControls";
 
-import { stopBgMusic, playSelectMove } from "../sound";
+import { stopBgMusic, playSelectMove, playScreenOpen } from "../sound";
 
 class StartEndScreen {
 
@@ -42,7 +42,7 @@ class StartEndScreen {
                 }
                 if (command === "select") {
                     const i = this.getNormalIndex();
-                    playSelectMove();
+                    playScreenOpen();
                     if (i === 0) {
                         if (this.onPlay) {
                             this.onPlay();
@@ -66,7 +66,7 @@ class StartEndScreen {
         setTimeout(() => {
             this.unsubInput = listenForInputEvents((command) => {
                 if (command === "select") {
-                    playSelectMove();
+                    playScreenOpen();
                     if (this.unsubInput) this.unsubInput();
                     aboutContainer.style.display = "none";
                     this.showStartScreen();

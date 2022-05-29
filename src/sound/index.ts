@@ -16,7 +16,7 @@ const rareFruitFourth = new Audio(rareFruitWav);
 const selectMove = new Audio(selectMoveWav);
 const selectMoveBackup = new Audio(selectMoveWav);
 
-selectMove.volume = 0.2;
+selectMove.volume = 0.1;
 
 click.volume = 0.3;
 backupClick.volume = 0.3;

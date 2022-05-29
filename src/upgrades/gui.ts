@@ -3,6 +3,8 @@ const container = document.querySelector<HTMLElement>("#upgrades-container");
 
 import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
 
+import { playSelectMove, playScreenOpen } from "../sound";
+
 import icons from "../../assets/iconset.jpg";
 
 if (!container) {
@@ -57,8 +59,6 @@ class UpgradesManager {
         moneySlot.innerText = t.toString();
     }
 
-
-
     showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onSelection: Function) {
 
         const choices = this.getChoices();
@@ -96,22 +96,27 @@ class UpgradesManager {
 
                 if (!this.wantToSkip) {
                     if (input === "left") {
+                        playSelectMove();
                         this.changeSelection(-1);
                     } else if (input === "right") {
+                        playSelectMove();
                         this.changeSelection(1);
                     }
                 }
 
 
                 if (input === "up") {
+                    playSelectMove();
                     this.unhighlightSkip();
                 } else if (input === "down") {
+                    playSelectMove();
                     this.highlightSkip();
                 }
 
                 if (input === "select") {
 
                     if (this.wantToSkip) {
+                        playScreenOpen();
                         onSelection(-1);
                         this.cleanup();
                     } else {
@@ -119,6 +124,7 @@ class UpgradesManager {
                         if (upgrade.cost >= timeCoins) {
                             return;
                         }
+                        playScreenOpen();
                         onSelection(this.hoveredUpgradeIndex);
                         this.cleanup();
                     }
