@@ -26,16 +26,19 @@ const renderer = new WebGLRenderer({
 
 const composer = new EffectComposer(renderer);
 
-renderer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
-composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+
 
 const monitor = document.querySelector<HTMLDivElement>("#virtual-monitor");
 if (!monitor) throw new Error("No monitor for renderer");
-window.addEventListener("resize", () => {
+
+const resizeScreen = () => {
     renderer.setSize(monitor.clientWidth, monitor.clientHeight);
-    composer.setSize(canvasElement.clientWidth, canvasElement.clientHeight);
+    composer.setSize(monitor.clientWidth, monitor.clientHeight);
     blurUniforms.resolution.value = new Vector2(window.innerWidth, window.innerHeight);
     blurUniforms.center.value = blurUniforms.resolution.value.clone().multiplyScalar(0.5);
+};
+window.addEventListener("resize", () => {
+    resizeScreen();
 });
 
 renderer.setClearColor(0x000000);
@@ -94,6 +97,8 @@ let blurLevel = 0.01;
 export const setBlurLevel = (level: number) => {
     blurLevel = level * 0.15  ;
 };
+
+resizeScreen();
 
 
 class FlashCollection {
@@ -219,6 +224,7 @@ export const renderLoop = (scene: Scene, camera: Camera, onLoop: (dt: number) =>
         }
     };
 
+    resizeScreen();
     window.requestAnimationFrame(internalLoop);
 
 };
