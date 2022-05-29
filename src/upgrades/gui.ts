@@ -43,7 +43,7 @@ const clippyUpgradeSayings = shuffleArray([
     `Wow, you're going pretty fast.`,
     `You might be a new file every time you play, but I remember you!`,
     `Some files never get downloaded ... consider yourself lucky!`,
-    `It seems you are having no trouble selecting an upgrade.`,
+    `It seems you are having NO trouble selecting an upgrade.`,
     `Jumping can help you get delicious fruit when it counts!`,
     `Yum.`
 ]);
