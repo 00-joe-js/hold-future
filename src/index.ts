@@ -103,6 +103,7 @@ const startGame = async () => {
     let chanceForRareFruit = 0.05;
     let portionForBaseSpeed = 0.2;
     let upgradeDiscount = 0;
+    let fruitRadius = 15;
 
     const {
         gameLoopFn,
@@ -268,28 +269,28 @@ const startGame = async () => {
 
                                 if (upgradeName === "Project Gravitas") {
                                     projectGravitasActivated = true;
-                                } else if (upgradeName === "The Juice.") {
+                                } else if (upgradeName === "The Juice") {
                                     changeSpeed(5);
                                 } else if (upgradeName === "Hello, Neighbor!") {
                                     increaseColliderSize(150);
                                 } else if (upgradeName === "Extra Juicy!") {
-                                    changeSpeed(15);
+                                    changeSpeed(20);
                                 } else if (upgradeName === "Boost Fruit") {
                                     fruitBoost += 10;
-                                } else if (upgradeName === "MORE Fruit") {
+                                } else if (upgradeName === "More Fruit") {
                                     fruitPerTrack += 30;
-                                } else if (upgradeName === "LOADS of Fruit") {
+                                } else if (upgradeName === "Loads of Fruit") {
                                     fruitPerTrack += 200;
                                 } else if (upgradeName === "Optic Fiber") {
                                     trackWidth -= 1750;
                                     setTrackWallZed(trackWidth / 2);
                                 } else if (upgradeName === "Super Berries") {
-                                    chanceForRareFruit += 0.2;
+                                    chanceForRareFruit += 0.4;
                                 } else if (upgradeName === "Limited-Time Offer") {
                                     upgradeDiscount += 5;
                                 } else if (upgradeName === "Sustainability") {
                                     fruitBoost -= 5;
-                                    portionForBaseSpeed += 0.2;
+                                    portionForBaseSpeed += 0.4;
                                 }
                             }
 
@@ -304,6 +305,7 @@ const startGame = async () => {
                         });
                     } else {
                         const newTrackLength = 500000;
+                        fruitRadius += 40;
                         resetLevel(scene, player, newTrackLength);
                         setTrackDimensions(newTrackLength, trackWidth);
                         styleFinalDownload();
@@ -345,7 +347,7 @@ const startGame = async () => {
                     ));
                 }
 
-                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, pt, (moreSpeed: number) => {
+                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, fruitRadius, pt, (moreSpeed: number) => {
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
                     changeSpeed(moreSpeed * portionForBaseSpeed);
                 }, (group: Group) => {

@@ -12,8 +12,9 @@ export interface Item {
 }
 
 const createAndPlaceSpeedFruit = (
-    rareChance: number, 
-    pos: Vector3, 
+    rareChance: number,
+    baseRadius: number = 15,
+    pos: Vector3,
     increaseSpeed: (d: number) => void, 
     pleaseDestroy: (g: Group) => void
 ): Item => {
@@ -23,8 +24,8 @@ const createAndPlaceSpeedFruit = (
     
     const randomScalar = Math.random() * 30;
 
-    let radius = 10 + randomScalar;
-    let baseSpeed = 1 + ((randomScalar / 30) * .2);
+    let radius = baseRadius + randomScalar;
+    let baseSpeed = 1 + ((randomScalar / 30) * .35);
 
     if (Math.random() < rareChance) {
         isRare = true;
@@ -57,10 +58,10 @@ const createAndPlaceSpeedFruit = (
                 increaseSpeed(baseSpeed);
                 if (isRare) {
                     /// 0xffaaee
-                    flash([1, 0.6, 0.9], 0.07, 0.0001);
+                    flash([1, 0.6, 0.9], 0.05, 0.0001);
                     playRareFruit();
                 } else {
-                    flash([0, 1, 0], 0.03, 0.0005);
+                    flash([0, 1, 0], 0.015, 0.0005);
                     playClick();
                 }
             }

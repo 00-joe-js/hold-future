@@ -6,9 +6,9 @@ export default [
         iconPos: [-383, -553]
     },
     {
-        name: "The Juice.",
+        name: "The Juice",
         description: `<strong>Increase your base speed by 5</strong>. It's not fancy, but it's fast.`,
-        cost: 10,
+        cost: 5,
         iconPos: [-420, -295]
     },
     {
@@ -19,7 +19,7 @@ export default [
     },
     {
         name: "Extra Juicy!",
-        description: `For those days you really need the juice. <strong>Increase your base speed by 15</strong>! Sometimes you gotta splurge.`,
+        description: `For those days you really need the juice. <strong>Increase your base speed by 20</strong>! Sometimes you gotta splurge.`,
         cost: 15,
         iconPos: [-457, -442]
     },
@@ -30,13 +30,13 @@ export default [
         iconPos: [-235, 1]
     },
     {
-        name: "MORE Fruit",
+        name: "More Fruit",
         description: `<strong>More speed fruit</strong>. You gotta eat them to go fast!`,
         cost: 5,
         iconPos: [-420, -146]
     },
     {
-        name: "LOADS of Fruit",
+        name: "Loads of Fruit",
         description: `<strong>Speed fruit everywhere</strong>. There is a sizeable investment for such ... abundance.`,
         cost: 20,
         iconPos: [-235, -36]
@@ -44,7 +44,7 @@ export default [
     {
         name: "Optic Fiber",
         description: `<strong>The track becomes narrower.</strong> You can't fall off of a wire! Also, it puts all the fruit together.`,
-        cost: 10,
+        cost: 5,
         iconPos: [-420, -220]
     },
     {
@@ -56,14 +56,14 @@ export default [
     {
         name: "Limited-Time Offer",
         description: `What a steal! <strong>Any future upgrades cost 5 seconds less</strong>.`,
-        cost: 10,
+        cost: 5,
         iconPos: [-420, -257],
         // alwaysPick: true
     },
     {
         name: "Sustainability",
-        description: `Speed fruit grants <strong>more base speed but slightly less boost</strong>. Better for building up early.`,
-        cost: 10,
+        description: `Speed fruit grants <strong>more base speed but slightly less boost</strong>.`,
+        cost: 5,
         iconPos: [-125, -479]
     }
 ];
