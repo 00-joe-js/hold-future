@@ -90,10 +90,31 @@ body {
   align-items: center;
 }
 
-#start-screen-buttons span {
+#start-screen-buttons span, #about-back {
   display: block;
   background: rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
+}
+
+#about-back {
+  display: inline-block;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#about {
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 100);
+  font-family: monospace;
+  font-size: 2.5rem;
+  padding: 2rem;
+  color: white;
 }
 
 #death-screen {
@@ -352,7 +373,7 @@ body {
   background: rgba(200, 200, 20, 0.9);
   color: black;
   font-size: 1.3rem;
-  font-family: monospace;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-weight: normal;
   margin-left: auto;
   padding: 2rem;

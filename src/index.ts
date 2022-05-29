@@ -65,7 +65,7 @@ import createSpeedFruit, { Item } from "./items/speedFruit";
 import GameTimer from "./gameTimer";
 import upgradesManager from "./upgrades/gui";
 import ProgressBar from "./progressBar";
-import StartEndScreen, { Clippy } from "./startEndScreen";
+import StartEndScreen, { clippy } from "./startEndScreen";
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(80, RESOLUTION, 1, 200000000);
@@ -83,7 +83,6 @@ if (!HUD_STATS) throw new Error("HUD stats.");
 HUD.style.opacity = "1.0";
 
 const startEndScreen = new StartEndScreen();
-const clippy = new Clippy();
 
 startEndScreen.showStartScreen();
 

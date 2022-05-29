@@ -11,6 +11,8 @@ export interface Item {
     onPlayerCollide: () => void
 }
 
+const randomColors = [0xff0000, 0x00ff00, 0xffff00, 0xeeff00, 0xff00aa];
+
 const createAndPlaceSpeedFruit = (
     rareChance: number,
     baseRadius: number = 15,
@@ -40,9 +42,8 @@ const createAndPlaceSpeedFruit = (
     }
 
     if (randomColor) {
-        color = MathUtils.randInt(0, 16777215);
+        color = randomColors[Math.floor(Math.random() * randomColors.length)]
     }
-
 
     const group = new Group();
 

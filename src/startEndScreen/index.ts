@@ -6,7 +6,7 @@ import brokenLoader from "../../assets/badloader.gif";
 
 import listenForInputEvents from "../hudControls";
 
-import {stopBgMusic} from "../sound";
+import { stopBgMusic } from "../sound";
 
 class StartEndScreen {
 
@@ -29,26 +29,48 @@ class StartEndScreen {
         if (!startContainer) throw new Error("No start container");
         this.container.style.opacity = "1.0";
         startContainer.style.display = "flex";
-        this.unsubInput = listenForInputEvents((command) => {
-            if (command === "down") {
-                this.selectionIndex = this.selectionIndex + 1;
-            }
-            if (command === "up") {
-                this.selectionIndex = this.selectionIndex - 1;
-            }
-            if (command === "select") {
-                const i = this.getNormalIndex();
-                if (i === 0) {
-                    if (this.onPlay) {
-                        this.onPlay();
-                        this.hide();
-                    }
-                } else {
-                    console.log("About");
+        clippy.show();
+        setTimeout(() => {
+            this.unsubInput = listenForInputEvents((command) => {
+                if (command === "down") {
+                    this.selectionIndex = this.selectionIndex + 1;
                 }
-            }
-            this.highlightSelection();
-        });
+                if (command === "up") {
+                    this.selectionIndex = this.selectionIndex - 1;
+                }
+                if (command === "select") {
+                    const i = this.getNormalIndex();
+                    if (i === 0) {
+                        if (this.onPlay) {
+                            this.onPlay();
+                            this.hide();
+                        }
+                    } else {
+                        this.showAbout();
+                    }
+                }
+                this.highlightSelection();
+            });
+        }, 200);
+
+    }
+    showAbout() {
+        if (this.unsubInput) this.unsubInput();
+        clippy.hide();
+        const aboutContainer = document.querySelector<HTMLElement>("#about");
+        if (!aboutContainer) throw new Error("#about?");
+        aboutContainer.style.display = "block";
+        setTimeout(() => {
+            this.unsubInput = listenForInputEvents((command) => {
+                console.log(command);
+                if (command === "select") {
+                    if (this.unsubInput) this.unsubInput();
+                    aboutContainer.style.display = "none";
+                    this.showStartScreen();
+                }
+            });
+        }, 500);
+
     }
     hide() {
         const startContainer = this.container.querySelector<HTMLElement>("#start-screen");
@@ -144,7 +166,7 @@ class StartEndScreen {
 
 }
 
-export class Clippy {
+class Clippy {
     container: HTMLDivElement;
     constructor() {
         const container = document.querySelector<HTMLDivElement>("#clippy");
@@ -166,5 +188,7 @@ export class Clippy {
         clippyImg.src = clippyGif;
     }
 }
+
+export const clippy = new Clippy();
 
 export default StartEndScreen;

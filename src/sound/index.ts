@@ -21,7 +21,7 @@ rareFruitBackup.volume = 0.1;
 rareFruitThird.volume = 0.1;
 rareFruitFourth.volume = 0.1;
 
-moan.volume = 0.6;
+moan.volume = 0.0;
 screenOpen.volume = 0.7;
 
 moan.loop = true;
