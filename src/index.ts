@@ -41,10 +41,13 @@ function shuffleArray(array: Array<any>) {
 
 const getRandomUpgrades = (discount: number) => {
     const alwaysPick = TEST_UPGRADES.find(u => u.alwaysPick);
+    let ups = [];
     if (alwaysPick) {
-        return [alwaysPick, alwaysPick, alwaysPick];
+        ups = [alwaysPick, ...shuffleArray(TEST_UPGRADES).slice(0, 2)];
+    } else {
+        ups = shuffleArray(TEST_UPGRADES).slice(0, 3);
     }
-    return shuffleArray(TEST_UPGRADES).slice(0, 3).map(u => (
+    return ups.map(u => (
         { ...u, cost: u.cost - discount }
     ));
 };
@@ -95,9 +98,10 @@ const startGame = async () => {
     // UPGRADE VALUES other than SPEED.
     let trackWidth = 5000;
     let projectGravitasActivated = false;
-    let fruitBoost = 10;
+    let fruitBoost = 15;
     let fruitPerTrack = 50;
     let chanceForRareFruit = 0.05;
+    let portionForBaseSpeed = 0.2;
     let upgradeDiscount = 0;
 
     const {
@@ -171,7 +175,6 @@ const startGame = async () => {
 
             const totalRunTime = 120;
             // 7 15s to work with
-
 
             let START_TRACK_LENGTH = 50000;
             let NORMAL_TRACK_LENGTH = 100000;
@@ -252,12 +255,13 @@ const startGame = async () => {
                         newTime && timer.grantMoreTime(newTime);
                         pauseRendering();
                         playScreenOpen();
-                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), getRandomUpgrades(upgradeDiscount), (selected: number) => {
+                        const upgrades = getRandomUpgrades(upgradeDiscount);
+                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, (selected: number) => {
 
                             if (selected === -1) {
                                 // Skip.
                             } else {
-                                const selectedUpgrade = TEST_UPGRADES[selected];
+                                const selectedUpgrade = upgrades[selected];
                                 const upgradeName = selectedUpgrade.name;
 
                                 timer.deductTime(selectedUpgrade.cost);
@@ -271,7 +275,7 @@ const startGame = async () => {
                                 } else if (upgradeName === "Extra Juicy!") {
                                     changeSpeed(20);
                                 } else if (upgradeName === "Boost Fruit") {
-                                    fruitBoost += 5;
+                                    fruitBoost += 10;
                                 } else if (upgradeName === "MORE Fruit") {
                                     fruitPerTrack += 30;
                                 } else if (upgradeName === "LOADS of Fruit") {
@@ -283,6 +287,9 @@ const startGame = async () => {
                                     chanceForRareFruit += 0.2;
                                 } else if (upgradeName === "Limited-Time Offer") {
                                     upgradeDiscount += 5;
+                                } else if (upgradeName === "Sustainability") {
+                                    fruitBoost -= 5;
+                                    portionForBaseSpeed += 0.4;
                                 }
                             }
 
@@ -342,8 +349,9 @@ const startGame = async () => {
                 }
 
                 items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, pt, (moreSpeed: number) => {
-                    grantDecayingSpeedBonus(moreSpeed * fruitBoost, 2000, globalTime.getTime());
-                    changeSpeed(moreSpeed / 5);
+                    console.log(moreSpeed, fruitBoost, portionForBaseSpeed);
+                    grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
+                    changeSpeed(moreSpeed * portionForBaseSpeed);
                     setGoalBrightness(0.4);
                     setTimeout(() => {
                         setGoalBrightness(0.0);

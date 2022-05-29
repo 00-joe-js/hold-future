@@ -59,5 +59,11 @@ export default [
         cost: 10,
         iconPos: [-420, -257],
         // alwaysPick: true
+    },
+    {
+        name: "Sustainability",
+        description: `Speed fruit grants <strong>more base speed but slightly less boost</strong>. Better for building up early.`,
+        cost: 10,
+        iconPos: [-125, -479]
     }
 ];
