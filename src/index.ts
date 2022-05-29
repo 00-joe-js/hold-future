@@ -215,7 +215,7 @@ const startGame = async () => {
 
             scene.add(skybox);
 
-            const { ground, goal, setTrackDimensions, setGoalBrightness } = createGround(START_TRACK_LENGTH, trackWidth);
+            const { ground, goal, setTrackDimensions, styleFinalDownload } = createGround(START_TRACK_LENGTH, trackWidth);
             scene.add(ground);
             scene.add(goal);
 
@@ -300,16 +300,13 @@ const startGame = async () => {
                                 const newTrackLength = 100000;
                                 resetLevel(scene, player, newTrackLength);
                                 setTrackDimensions(newTrackLength, trackWidth);
-                                setTimeout(() => {
-                                    flash([0, 1, 1], 0.3);
-                                }, 100);
                             }, 200);
                         });
                     } else {
                         const newTrackLength = 500000;
                         resetLevel(scene, player, newTrackLength);
                         setTrackDimensions(newTrackLength, trackWidth);
-                        setGoalBrightness(0.8);
+                        styleFinalDownload();
                         onLastGoal = true;
                     }
                 }
@@ -351,10 +348,6 @@ const startGame = async () => {
                 items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, pt, (moreSpeed: number) => {
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
                     changeSpeed(moreSpeed * portionForBaseSpeed);
-                    setGoalBrightness(0.55 * (1.0 - (camera.position.x / goal.position.x)));
-                    setTimeout(() => {
-                        setGoalBrightness(0.0);
-                    }, 500);
                 }, (group: Group) => {
                     requestAnimationFrame(() => {
                         scene.remove(group);

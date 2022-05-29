@@ -137,7 +137,7 @@ class FlashCollection {
 
 }
 const flashCollection = new FlashCollection();
-export const flash = (baseColor: number[], initialLevel: number = 0.25) => {
+export const flash = (baseColor: number[], initialLevel: number = 0.25, degrade: number = 0.003) => {
 
     let flashLevel = initialLevel;
 
@@ -151,7 +151,7 @@ export const flash = (baseColor: number[], initialLevel: number = 0.25) => {
         colorV.set(baseColor[0], baseColor[1], baseColor[2]);
         colorV.multiplyScalar(flashLevel);
         flashCollection.setFlashValue(flashId, colorV);
-        flashLevel = flashLevel - 0.003;
+        flashLevel = flashLevel - degrade;
         if (flashLevel <= 0) {
             if (interval) {
                 flashCollection.removeFlash(flashId);

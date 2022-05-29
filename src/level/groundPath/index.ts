@@ -8,7 +8,7 @@ import noiseTex from "../../../assets/noisetextures/explosion.png";
 
 export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
 
-    const u = { uTime: { value: 0.0 } };
+    const u = { uTime: { value: 0.0 }, lift: { value: 0.0 } };
     const groundMat = new ShaderMaterial({
         wireframe: true,
         uniforms: u,
@@ -37,10 +37,6 @@ export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
         u_time: { value: 0 },
         u_tex: { value: new TextureLoader().load(noiseTex) },
         u_brightness: { value: 0.0 }
-    };
-
-    const setGoalBrightness = (v: number) => {
-        goalU.u_brightness.value = v;
     };
 
     const goalMat = new ShaderMaterial({
@@ -78,6 +74,11 @@ export default (initialTrackLength = 100000, initialTrackWidth = 5000) => {
         return goal.position.x - pt.x;
     };
 
-    return { ground, goal, setTrackDimensions, distanceToGoal, setGoalBrightness };
+    const styleFinalDownload = () => {
+        goalU.u_brightness.value = 1.0;
+        u.lift.value = 1.0;
+    };
+
+    return { ground, goal, setTrackDimensions, distanceToGoal, styleFinalDownload };
 
 };
