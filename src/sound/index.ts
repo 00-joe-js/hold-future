@@ -3,6 +3,7 @@ import bgMusicUrl from "../../assets/sounds/sonicwhat.wav";
 import screenWav from "../../assets/sounds/goal.wav";
 import rareFruitWav from "../../assets/sounds/rarefruit.wav";
 import selectMoveWav from "../../assets/sounds/selectmove.wav";
+import clippyWav from "../../assets/sounds/clippy.wav";
 
 const bgMusic = new Audio(bgMusicUrl);
 const screenOpen = new Audio(screenWav);
@@ -15,6 +16,9 @@ const rareFruitThird = new Audio(rareFruitWav);
 const rareFruitFourth = new Audio(rareFruitWav);
 const selectMove = new Audio(selectMoveWav);
 const selectMoveBackup = new Audio(selectMoveWav);
+const clippy = new Audio(clippyWav);
+
+clippy.volume = 0.3;
 
 selectMove.volume = 0.1;
 
@@ -110,3 +114,9 @@ export const playSelectMove = () => {
         }
     }
 };
+
+export const playClippy = () => {
+    if (canPlay) {
+        clippy.play();
+    }
+}

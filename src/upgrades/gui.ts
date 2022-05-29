@@ -3,9 +3,12 @@ const container = document.querySelector<HTMLElement>("#upgrades-container");
 
 import KeyboardInterface, { gamepad } from "../firstPersonCharacter/inputHelper";
 
+import { clippy } from "../startEndScreen";
+
 import { playSelectMove, playScreenOpen } from "../sound";
 
 import icons from "../../assets/iconset.jpg";
+import { MathUtils } from "three";
 
 if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");
@@ -17,6 +20,23 @@ interface Upgrade {
     cost: number;
     iconPos?: number[]
 }
+
+const clippyUpgradeSayings = [
+    `Ah, the trusty upgrade screen ... Choose wisely, \${filename}!`,
+    `Some upgrades are better earlier. Others are better later.`,
+    `Very expensive upgrades are usually very powerful. Buy them when you have a lot of extra time!`,
+    `I wonder what a super fruit tastes like. I envy you, \${filename}!`,
+    `Blippy, at your service!`,
+    `Speed fruit gives you more base speed and also a temporary boost of speed.`,
+    `The only thing better than speed fruit are SUPER BERRIES! Get the juicy ones.`,
+    `Don't worry, you can't fall off this wire!`,
+    `Wow, you're going pretty fast.`,
+    `You might be a new file every time you play, but I remember you!`,
+    `Some files never get downloaded ... consider yourself lucky!`,
+    `It seems you are having no trouble selecting an upgrade.`,
+    `Jumping can help you get delicious fruit when it counts!`,
+    `Yum.`
+];
 
 
 class UpgradesManager {
@@ -66,6 +86,13 @@ class UpgradesManager {
         this.runHueRotation = true;
 
         this.setMoney(timeCoins);
+
+        if (Math.random() > .7) {
+            clippy.setText(clippyUpgradeSayings[MathUtils.randInt(0, clippyUpgradeSayings.length - 1)]);
+            setTimeout(() => {
+                clippy.show();
+            }, 1000);
+        }
 
         choices.forEach((c, i) => {
             const { name, description, cost, iconPos } = upgradeDescriptions[i];
@@ -141,6 +168,7 @@ class UpgradesManager {
         this.wantToSkip = false;
         this.hoveredUpgradeIndex = 0;
         this.runHueRotation = false;
+        clippy.hide();
     }
 
     changeSelection(dir: number) {

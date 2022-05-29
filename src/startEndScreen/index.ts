@@ -6,7 +6,7 @@ import brokenLoader from "../../assets/badloader.gif";
 
 import listenForInputEvents from "../hudControls";
 
-import { stopBgMusic, playSelectMove, playScreenOpen } from "../sound";
+import { stopBgMusic, playSelectMove, playScreenOpen, playClippy } from "../sound";
 
 class StartEndScreen {
 
@@ -181,9 +181,16 @@ class Clippy {
     }
     show() {
         this.container.style.display = "flex";
+        playClippy();
     }
     hide() {
         this.container.style.display = "none";
+    }
+    setText(textValue: string) {
+        const clippySays = this.container.querySelector("#clippy-says");
+        if (clippySays) {
+            clippySays.innerHTML = textValue;
+        }
     }
     private setClippy() {
         const clippyImg = document.querySelector<HTMLImageElement>("#clippy-img");
