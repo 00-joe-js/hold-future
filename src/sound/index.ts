@@ -58,7 +58,7 @@ export const playClick = () => {
 
 export const playBgMusic = () => {
     if (canPlay) {
-        // bgMusic.play();
+        bgMusic.play();
     }
 };
 
