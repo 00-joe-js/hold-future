@@ -8,7 +8,6 @@ import { clippy } from "../startEndScreen";
 import { playSelectMove, playScreenOpen } from "../sound";
 
 import icons from "../../assets/iconset.jpg";
-import { MathUtils } from "three";
 
 if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");

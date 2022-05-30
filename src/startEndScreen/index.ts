@@ -13,7 +13,7 @@ class StartEndScreen {
     private container: HTMLDivElement;
     private selectionIndex: number = 0;
     private unsubInput: Function | null = null;
-    private buttonAmount: number = 2;
+    private buttonAmount: number = 3;
 
     private onPlay: Function | null;
 
@@ -101,7 +101,7 @@ class StartEndScreen {
     }
 
     getNormalIndex() {
-        return Math.abs(this.selectionIndex % 2);
+        return Math.abs(this.selectionIndex % 3);
     }
 
     highlightSelection() {

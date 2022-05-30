@@ -78,12 +78,13 @@ body {
 
 #start-screen {
   background: rgb(0, 0, 100);
+  padding-top: 1rem;
 }
 
 #start-screen h1 {
   color: white;
   font-size: 8rem;
-  margin-bottom: 7rem;
+  margin-bottom: 4rem;
 }
 
 #start-screen-buttons {
@@ -98,9 +99,16 @@ body {
   margin-bottom: 1rem;
 }
 
+#hunter {
+  position: absolute;
+  top: -2rem;
+  height: 5rem;
+}
+
 #about-back {
   display: inline-block;
   margin: 0 auto;
+  margin-top: 2.5rem;
   padding: 2rem;
   background: rgba(0, 0, 0, 0.5);
 }
@@ -114,7 +122,7 @@ body {
   height: 100%;
   background: rgb(0, 0, 100);
   font-family: monospace;
-  font-size: 2.5rem;
+  font-size: 2rem;
   padding: 2rem;
   color: white;
 }
