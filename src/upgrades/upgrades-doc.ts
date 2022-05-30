@@ -63,7 +63,7 @@ export default [
     {
         name: "Sustainability",
         description: `Speed fruit grants <strong>more base speed but slightly less boost</strong>.`,
-        cost: 5,
+        cost: 10,
         iconPos: [-125, -479]
     },
     {

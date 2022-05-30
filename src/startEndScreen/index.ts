@@ -7,6 +7,8 @@ import brokenLoader from "../../assets/badloader.gif";
 import listenForInputEvents from "../hudControls";
 
 import { stopBgMusic, playSelectMove, playScreenOpen, playClippy } from "../sound";
+import giphyIds from "./giphyIds";
+import { MathUtils } from "three";
 
 class StartEndScreen {
 
@@ -22,6 +24,9 @@ class StartEndScreen {
         this.container = container;
         this.onPlay = null;
         this.highlightSelection();
+        setTimeout(() => {
+            this.loadWinGif();
+        }, 20 * 1000);
     }
 
     showStartScreen() {
@@ -154,9 +159,6 @@ class StartEndScreen {
     showWinScreen() {
         const winContainer = this.container.querySelector<HTMLElement>("#win-screen");
         if (!winContainer) throw new Error("Missing win screen.");
-        const winImg = winContainer.querySelector("img");
-        if (!winImg) throw new Error("No win image");
-        winImg.src = winGif;
         winContainer.style.display = "flex";
         this.container.style.opacity = "1.0";
         setTimeout(() => {
@@ -170,6 +172,18 @@ class StartEndScreen {
                 }
             });
         }, 1000);
+    }
+    getRandomGiphy() {
+        const ids = giphyIds;
+        // return ids[ids.length - 1];
+        return ids[Math.floor(Math.random() * ids.length)];
+    }
+    loadWinGif() {
+        const giphyIframe = document.querySelector<HTMLIFrameElement>("#giphy-iframe");
+        if (!giphyIframe) throw new Error("Giphy element?");
+        // https://giphy.com/embed/121YQW1OQhqGLS
+        const code = this.getRandomGiphy();
+        giphyIframe.src = `https://giphy.com/embed/${code}`;
     }
 
     registerOnPlayListener(fn: Function) {

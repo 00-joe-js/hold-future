@@ -75,7 +75,7 @@
                                 made by
                                 <a href="https://www.youtube.com/channel/UC0FjCobD75UJCCAGkp0YV6Q" target="_blank"
                                     rel="noopener">Joe Alves</a>.
-                                <br /><br />Built in 5 days for <a href="https://itch.io/jam/jame-gam-18"
+                                <br /><br />Built in 1 week for <a href="https://itch.io/jam/jame-gam-18"
                                     target="_blank" rel="noopener">Jame Gam
                                     #18</a>.
                                 <br />Theme: "Time is Money". Special Object: "Clip".
@@ -119,11 +119,12 @@
                             <hr />
                             <div id="strategy">
                                 <p class="clippy-says">To successfully download ...</p>
-                                <p>Move fast! Collect as many <strong>super fruit</strong> as possible. They make you
+                                <p>Move fast! Collect as many <strong>speed fruit</strong> as possible. They make you
                                     faster in more than one way!</p>
                                 <p style="font-size: 1rem">
-                                    Oh, and use the relay ports! A file moving through the internet doesn't go through
-                                    just two computers, you know?
+                                    Oh, and use the relay ports! Communication across the internet doesn't just happen
+                                    on
+                                    just two computers, you know? There are many stops along the way.
                                     At each relay, you will be able to choose a different port than the one assigned. It
                                     really changes your download journey!
                                 </p>
@@ -133,11 +134,11 @@
                                         style="width: 40px; height: 50px; background-position: -50px 0; position: absolute; bottom: 0;"></span>
                                 </p>
                                 <p>
-                                    Think of them as <strong>upgrades</strong>! Finding the right port (I mean
-                                    *UPGRADE*) <strong>takes time</strong>, however, so spend time wisely!
+                                    Think of them as <strong>upgrades</strong>! However, finding the right port (I mean
+                                    *UPGRADE*) <strong>takes time</strong>, so spend time wisely!
                                 </p>
                             </div>
-                            <span id="help-back">Press Spacebar/Select to Return</span>
+                            <span id="help-back">Press Spacebar/Select to Return. Good luck, ${file_name}!</span>
                         </div>
                     </div>
                     <div id="death-screen">
@@ -146,8 +147,13 @@
                         <h3>Press jump to download again</h3>
                     </div>
                     <div id="win-screen">
-                        <h2>Download Complete!</h2>
-                        <img id="win-file" />
+                        <h2 style="margin-bottom: 1rem;">Download Complete!</h2>
+                        <h6 style="margin: 1rem 0;">The user successfully received this file:</h6>
+                        <div style="position: relative;">
+                            <iframe id="giphy-iframe" width="400" height="300" frameBorder="0"
+                                class="giphy-embed"></iframe>
+                            <span style="position:absolute;bottom:-2rem;right:-5rem;" class="clippy-says">Great job, <span id="fileId">${file_name}</span>!</span>
+                        </div>
                         <h3>Press jump to download again</h3>
                     </div>
                 </div>

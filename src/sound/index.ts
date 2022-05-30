@@ -18,6 +18,8 @@ const selectMove = new Audio(selectMoveWav);
 const selectMoveBackup = new Audio(selectMoveWav);
 const clippy = new Audio(clippyWav);
 
+const MUTE_BG = false;
+
 clippy.volume = 0.3;
 
 selectMove.volume = 0.1;
@@ -57,7 +59,7 @@ export const playClick = () => {
 };
 
 export const playBgMusic = () => {
-    if (canPlay) {
+    if (canPlay && !MUTE_BG) {
         bgMusic.play();
     }
 };

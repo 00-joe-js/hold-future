@@ -39,17 +39,24 @@ function shuffleArray(array: Array<any>) {
     return array;
 }
 
-const getRandomUpgrades = (discount: number) => {
-    const alwaysPick = TEST_UPGRADES.find(u => u.alwaysPick);
+const getRandomUpgrades = (discount: number, gravitasActivated: boolean, paintActivated: boolean) => {
+
     let ups = [];
-    if (alwaysPick) {
-        ups = [alwaysPick, ...shuffleArray(TEST_UPGRADES).slice(0, 2)];
-    } else {
-        ups = shuffleArray(TEST_UPGRADES).slice(0, 3);
-    }
+    let eligibleUpgrades = TEST_UPGRADES.slice(0);
+
+    eligibleUpgrades = eligibleUpgrades.filter(({ name }) => {
+        if (name === "Paint" && paintActivated) return false;
+        if (name === "Project Gravitas" && gravitasActivated) return false;
+        if (name === "Limited-Time Offer" && discount > 0) return false;
+        return true;
+    });
+
+    ups = shuffleArray(eligibleUpgrades).slice(0, 3);
+
     return ups.map(u => (
         { ...u, cost: u.cost - discount }
     ));
+
 };
 
 import { renderLoop } from "./renderer";
@@ -253,7 +260,9 @@ const startGame = async () => {
                         newTime && timer.grantMoreTime(newTime);
                         pauseRendering();
                         playScreenOpen();
-                        const upgrades = getRandomUpgrades(upgradeDiscount);
+                        const upgrades = getRandomUpgrades(
+                            upgradeDiscount, projectGravitasActivated, randomFruitColors
+                        );
                         upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, (selected: number) => {
 
                             if (selected === -1) {
@@ -289,7 +298,7 @@ const startGame = async () => {
                                     fruitBoost -= 10;
                                     portionForBaseSpeed += 0.4;
                                 } else if (upgradeName === "Jacked Fruit") {
-                                    fruitRadius += 50;
+                                    fruitRadius += 30;
                                 } else if (upgradeName === "Paint") {
                                     randomFruitColors = true;
                                 }
@@ -306,7 +315,12 @@ const startGame = async () => {
                         });
                     } else {
                         const newTrackLength = 500000;
-                        fruitRadius += 40;
+                        fruitRadius += 30;
+                        fruitPerTrack = fruitPerTrack * 2;
+                        increaseColliderSize(50);
+                        portionForBaseSpeed -= 0.2;
+                        fruitBoost += 5;
+                        
                         resetLevel(scene, player, newTrackLength);
                         setTrackDimensions(newTrackLength, trackWidth);
                         styleFinalDownload();

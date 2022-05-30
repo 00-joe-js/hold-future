@@ -175,10 +175,13 @@ class UpgradesManager {
     }
 
     cleanup() {
-        this.wantToSkip = false;
-        this.hoveredUpgradeIndex = 0;
-        this.runHueRotation = false;
         clippy.hide();
+        setTimeout(() => {
+            this.hoveredUpgradeIndex = 0;
+            this.runHueRotation = false;
+            this.wantToSkip = false;
+            this.unhighlightSkip();
+        }, 3000);
     }
 
     changeSelection(dir: number) {
