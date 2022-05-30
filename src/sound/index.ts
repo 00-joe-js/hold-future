@@ -30,7 +30,7 @@ rareFruitBackup.volume = 0.1;
 rareFruitThird.volume = 0.1;
 rareFruitFourth.volume = 0.1;
 
-bgMusic.volume = 0.15;
+bgMusic.volume = 0.125;
 bgMusic.loop = true;
 
 screenOpen.volume = 0.7;
@@ -58,7 +58,7 @@ export const playClick = () => {
 
 export const playBgMusic = () => {
     if (canPlay) {
-        bgMusic.play();
+        // bgMusic.play();
     }
 };
 

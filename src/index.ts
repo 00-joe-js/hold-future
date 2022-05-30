@@ -286,7 +286,7 @@ const startGame = async () => {
                                 } else if (upgradeName === "Limited-Time Offer") {
                                     upgradeDiscount += 5;
                                 } else if (upgradeName === "Sustainability") {
-                                    fruitBoost -= 5;
+                                    fruitBoost -= 10;
                                     portionForBaseSpeed += 0.4;
                                 } else if (upgradeName === "Jacked Fruit") {
                                     fruitRadius += 50;

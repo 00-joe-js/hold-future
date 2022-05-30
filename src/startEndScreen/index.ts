@@ -13,7 +13,7 @@ class StartEndScreen {
     private container: HTMLDivElement;
     private selectionIndex: number = 0;
     private unsubInput: Function | null = null;
-    private buttonAmount: number = 2;
+    private buttonAmount: number = 3;
 
     private onPlay: Function | null;
 
@@ -48,8 +48,10 @@ class StartEndScreen {
                             this.onPlay();
                             this.hide();
                         }
-                    } else {
+                    } else if (i === 1) {
                         this.showAbout();
+                    } else if (i === 2) {
+                        this.showHelp();
                     }
                 }
                 this.highlightSelection();
@@ -73,7 +75,23 @@ class StartEndScreen {
                 }
             });
         }, 500);
-
+    }
+    showHelp() {
+        if (this.unsubInput) this.unsubInput();
+        clippy.hide();
+        const helpContainer = document.querySelector<HTMLElement>("#help");
+        if (!helpContainer) throw new Error("#about?");
+        helpContainer.style.display = "block";
+        setTimeout(() => {
+            this.unsubInput = listenForInputEvents((command) => {
+                if (command === "select") {
+                    playScreenOpen();
+                    if (this.unsubInput) this.unsubInput();
+                    helpContainer.style.display = "none";
+                    this.showStartScreen();
+                }
+            });
+        }, 500);
     }
     hide() {
         const startContainer = this.container.querySelector<HTMLElement>("#start-screen");

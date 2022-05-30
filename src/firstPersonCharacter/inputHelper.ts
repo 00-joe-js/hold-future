@@ -10,6 +10,7 @@ class KeyboardInterface {
     dDown: boolean;
     ctrlDown: boolean;
     spaceDown: boolean;
+    escapeDown: boolean;
 
     _listener: ((e: KeyboardEvent) => void) | null;
     _offListener: ((e: KeyboardEvent) => void) | null;
@@ -21,6 +22,7 @@ class KeyboardInterface {
         this.dDown = false;
         this.ctrlDown = false;
         this.spaceDown = false;
+        this.escapeDown = false;
 
         this._listener = null;
         this._offListener = null;
@@ -32,7 +34,7 @@ class KeyboardInterface {
 
         const th: KeyboardInterface = this;
 
-        const { W_KEY_CODE, A_KEY_CODE, S_KEY_CODE, D_KEY_CODE, CTRL_KEY_CODE, SPACE_CODE } = KeyboardInterface;
+        const { W_KEY_CODE, A_KEY_CODE, S_KEY_CODE, D_KEY_CODE, CTRL_KEY_CODE, SPACE_CODE, ESCAPE_CODE } = KeyboardInterface;
 
         const makeListener = (bool: boolean) => {
             return (e: KeyboardEvent) => {
@@ -61,6 +63,9 @@ class KeyboardInterface {
                     case SPACE_CODE:
                         this.spaceDown = bool;
                         break;
+                    case ESCAPE_CODE:
+                        this.escapeDown = bool;
+                        break;
 
                 }
             };
@@ -86,6 +91,7 @@ class KeyboardInterface {
     static D_KEY_CODE = "KeyD";
     static CTRL_KEY_CODE = "ShiftLeft";
     static SPACE_CODE = "Space";
+    static ESCAPE_CODE = "Escape";
 
 }
 

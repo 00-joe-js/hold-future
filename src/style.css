@@ -105,7 +105,7 @@ body {
   height: 5rem;
 }
 
-#about-back {
+#help-back, #about-back {
   display: inline-block;
   margin: 0 auto;
   margin-top: 2.5rem;
@@ -113,7 +113,12 @@ body {
   background: rgba(0, 0, 0, 0.5);
 }
 
-#about {
+#help-back {
+  font-size: 1rem;
+  padding: 1rem;
+}
+
+#about, #help {
   position: absolute;
   display: none;
   top: 0;
@@ -122,9 +127,50 @@ body {
   height: 100%;
   background: rgb(0, 0, 100);
   font-family: monospace;
-  font-size: 2rem;
+  font-size: 2rem; 
   padding: 2rem;
   color: white;
+}
+
+.blippy-base {
+  background-image: url("assets/blippy.png");
+  width: 75px;
+  height: 100px;
+  background-size: 375%;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+
+.blippy-base.blush {
+  background-position: -95px -25px;
+}
+
+.blippy-base.error {
+  background-position: -180px -15px;
+}
+
+.blippy-entry {
+  display: flex;
+  align-items: center;
+}
+
+#the-basics {
+  font-size: 1.2rem;
+}
+
+#the-basics .blippy-base {
+  position: absolute;
+  top: -8rem;
+  right: 2rem;
+}
+
+#strategy {
+  font-size: 1.2rem;
+}
+
+.controls {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
 }
 
 #death-screen {
@@ -149,7 +195,7 @@ body {
 }
 
 #win-screen {
-  background: rgba(40, 155, 155, 0.9);
+  background: rgba(7, 242, 242, 0.9);
 }
 
 #win-screen h2 {
@@ -159,7 +205,7 @@ body {
 #win-screen h3 {
   color: blue;
   font-size: 4rem;
-  transition: all 2s linear;
+  transition: all 0.5s linear;
 }
 
 #three-canvas-container,
@@ -294,7 +340,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 2rem;
 }
 
 #upgrade-list {
@@ -308,7 +353,7 @@ body {
   color: rgb(0, 205, 205);
   text-align: center;
   font-size: 2.5rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
 .upgrade-choice {
@@ -336,7 +381,7 @@ body {
 }
 
 .upgrade-choice p {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   margin: 0;
 }
 
@@ -366,7 +411,7 @@ body {
   transition: color 0.5s linear, transform 0.2s linear;
   width: 40%;
   margin: 0 auto;
-  margin-top: 4rem;
+  margin-top: 2rem;
 }
 
 #clippy {
@@ -375,21 +420,30 @@ body {
   right: 2%;
   z-index: 1000;
   width: 55%;
-  display: flex;
+  /* display: flex; */
+  display: none;
   align-items: flex-end;
 }
 
-#clippy-says {
-  position: relative;
+.clippy-says, #clippy-says {
   background: rgba(200, 200, 20, 0.9);
   color: black;
   font-size: 1.3rem;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-weight: normal;
-  margin-left: auto;
   padding: 1rem;
-  margin-right: -1.5rem;
   display: flex;
+}
+
+.clippy-says {
+  display: inline-block;
+  margin: 1rem 0;
+}
+
+#clippy-says {
+  position: relative;
+  margin-left: auto;
+  margin-right: -1.5rem;
 }
 
 #clippy-img {

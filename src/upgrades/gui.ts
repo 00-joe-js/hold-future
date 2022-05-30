@@ -31,12 +31,12 @@ function shuffleArray(array: Array<any>) {
 }
 
 const clippyUpgradeSayings = shuffleArray([
-    `Ah, the trusty upgrade screen ... Choose wisely, \${filename}!`,
+    `Ah, the trusty upgrade screen ... Choose wisely, \${file_name}!`,
     `Some upgrades are better earlier. Others are better later.`,
-    `Very expensive upgrades are usually very powerful. Buy them when you have a lot of extra time!`,
-    `I wonder what a super fruit tastes like. I envy you, \${filename}!`,
+    `Expensive upgrades are usually very powerful. Just watch your time!`,
+    `I wonder what a super fruit tastes like. I envy you, \${file_name}!`,
     `Blippy, at your service!`,
-    `Speed fruit gives you more base speed and also a temporary boost of speed.`,
+    `Eating fruit gives you more overall speed and also a temporary boost!`,
     `The only thing better than speed fruit are SUPER BERRIES! Get the juicy ones.`,
     `Don't worry, you can't fall off this wire!`,
     `Wow, you're going pretty fast.`,
@@ -44,7 +44,8 @@ const clippyUpgradeSayings = shuffleArray([
     `Some files never get downloaded ... consider yourself lucky!`,
     `It seems you are having NO trouble selecting an upgrade.`,
     `Jumping can help you get delicious fruit when it counts!`,
-    `Yum.`
+    `Yum.`,
+    `Sometimes it's worth slowing down for nice fruit, but you should always be downloading!`
 ]);
 
 
