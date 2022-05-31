@@ -31,7 +31,7 @@ const createAndPlaceSpeedFruit = (
     const randomScalar = Math.random() * 30;
 
     let radius = baseRadius + randomScalar;
-    let baseSpeed = 1 + ((randomScalar / 30) * .25);
+    let baseSpeed = 1 + ((randomScalar / 30) * .3);
 
     if (Math.random() < rareChance) {
         isRare = true;

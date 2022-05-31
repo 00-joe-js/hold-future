@@ -285,7 +285,6 @@ const startGame = async () => {
                             upgradeDiscount, projectGravitasActivated, randomFruitColors, grantTimeBasedOnTopSpeed, dancingFruit
                         );
                         const isLastUpgrade = times.length === 0; // After shifting.
-                        console.log("raw isLast", isLastUpgrade)
                         upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, isLastUpgrade, (selected: number) => {
 
                             if (selected === -1) {
@@ -319,7 +318,7 @@ const startGame = async () => {
                                     upgradeDiscount += 5;
                                 } else if (upgradeName === "Sustainability") {
                                     fruitBoost -= 10;
-                                    portionForBaseSpeed += 0.4;
+                                    portionForBaseSpeed += 0.35;
                                 } else if (upgradeName === "Jacked Fruit") {
                                     fruitRadius += 30;
                                 } else if (upgradeName === "Paint") {
