@@ -32,7 +32,7 @@ rareFruitBackup.volume = 0.075;
 rareFruitThird.volume = 0.075;
 rareFruitFourth.volume = 0.075;
 
-bgMusic.volume = 0.125;
+bgMusic.volume = 0.2;
 bgMusic.loop = true;
 
 screenOpen.volume = 0.7;
