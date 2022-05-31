@@ -9,7 +9,8 @@ export default [
         name: "The Juice",
         description: `<strong>Increase your base speed by 5</strong>. It's not fancy, but it's fast.`,
         cost: 5,
-        iconPos: [-420, -295]
+        iconPos: [-198, -479],
+        alwaysPick: true
     },
     {
         name: "Project Gravitas",
@@ -56,9 +57,8 @@ export default [
     {
         name: "Limited-Time Offer",
         description: `What a steal! <strong>Any future upgrades cost 5 seconds less</strong>.`,
-        cost: 5,
+        cost: 10,
         iconPos: [-420, -257],
-        // alwaysPick: true
     },
     {
         name: "Sustainability",
@@ -74,8 +74,27 @@ export default [
     },
     {
         name: "Paint",
-        description: `<strong>Super berries</strong> give more speed, but they become <strong>indistinguishable from all super fruit</strong>.`,
+        description: `<strong>Super berries</strong> give more speed, but they become <strong>indistinguishable from all speed fruit</strong>.`,
         cost: 0,
         iconPos: [-456, -35]
+    },
+    {
+        name: "Sub-axis",
+        description: `<strong>Speed fruit tends to line up more</strong>. Just open your mouth and scoop 'em in!`,
+        cost: 5,
+        iconPos: [-162, -145],
+    },
+    {
+        name: "Instant Rebate",
+        description: `<strong>Get time back based on your top speed</strong>. Reach each upgrade screen quickly and get a little time back!`,
+        cost: 5,
+        iconPos: [-233, -516],
+    },
+    {
+        name: "Do the Wave",
+        description: `<strong>Speed fruit dance</strong> their special dance. It's more fun than skipping!`,
+        cost: 0,
+        iconPos: [-420, -368],
+        alwaysPick: true,
     }
 ];

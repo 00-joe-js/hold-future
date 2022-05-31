@@ -1,5 +1,5 @@
 import clickWav from "../../assets/sounds/click.wav";
-import bgMusicUrl from "../../assets/sounds/sonicwhat.wav";
+import bgMusicUrl from "../../assets/sounds/Trails_Of_Information.mp3";
 import screenWav from "../../assets/sounds/goal.wav";
 import rareFruitWav from "../../assets/sounds/rarefruit.wav";
 import selectMoveWav from "../../assets/sounds/selectmove.wav";
@@ -27,10 +27,10 @@ selectMove.volume = 0.1;
 click.volume = 0.3;
 backupClick.volume = 0.3;
 
-rareFruit.volume = 0.1;
-rareFruitBackup.volume = 0.1;
-rareFruitThird.volume = 0.1;
-rareFruitFourth.volume = 0.1;
+rareFruit.volume = 0.075;
+rareFruitBackup.volume = 0.075;
+rareFruitThird.volume = 0.075;
+rareFruitFourth.volume = 0.075;
 
 bgMusic.volume = 0.125;
 bgMusic.loop = true;

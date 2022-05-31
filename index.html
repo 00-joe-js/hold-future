@@ -13,12 +13,15 @@
             <div id="hud-overlay" style="opacity: 0;">
                 <div id="hud-stats">
                     <p id="speed"><span id="total-speed">0.0</span> <span id="base-speed">Base speed:
-                            <strong>0.0</strong></span></p>
-                    <p id="hud-time">0.0</p>
-                    <div id="progress-bar">
-                        <h6>.. DOWNLOADING ...</h6>
-                        <div id="progress-moving-bar"></div>
-                        <h2 id="progress-percentage">0%</h2>
+                            <span style="color: green; display: inline;">~</span><strong>0.0</strong></span>
+                    </p>
+                    <div id="hud-top">
+                        <p id="hud-time">0.0</p>
+                        <div id="progress-bar">
+                            <h6>.. DOWNLOADING ...</h6>
+                            <div id="progress-moving-bar"></div>
+                            <h2 id="progress-percentage">0%</h2>
+                        </div>
                     </div>
                 </div>
                 <div id="upgrades-container">
@@ -63,7 +66,7 @@
                 </div>
                 <div id="start-end-screen">
                     <div id="start-screen">
-                        <h1>Download Speed</h1>
+                        <h1 style="font-size: 10rem;">Download Speed</h1>
                         <div id="start-screen-buttons">
                             <span>Start Download</span>
                             <span>About</span>
@@ -82,12 +85,14 @@
                                 <br />
                                 <br />
                             <div style="position: relative;">Blippy art by Hunter Fastige.<img id="hunter"
-                                    src="assets/blippy.png" /></div><br /><br />
+                                    src="assets/blippy.png" /></div><br />
+                            Music: "Trail of Information" by <a href="https://ncomusicstudio.com/" target="_blank"
+                                rel="noopener">Noah Orona</a>.
+                            <br /><br />
                             Game and menu sounds courtesy of <a target="_blank" rel="noopener"
                                 href="https://groovymaster.itch.io/groovys-50-retro-sound-effects-package">Groovymaster</a>.
                             Thanks a lot, Groovymaster.
-                            <br />Music from <a href="https://tallbeard.itch.io/music-loop-bundle" target="_blank"
-                                rel="noopener">Free Music Loop Bundle</a>.
+
                             </p>
                             <span id="about-back">Press Spacebar/Select to Return</span>
                         </div>
@@ -152,7 +157,8 @@
                         <div style="position: relative;">
                             <iframe id="giphy-iframe" width="400" height="300" frameBorder="0"
                                 class="giphy-embed"></iframe>
-                            <span style="position:absolute;bottom:-2rem;right:-5rem;" class="clippy-says">Great job, <span id="fileId">${file_name}</span>!</span>
+                            <span style="position:absolute;bottom:-2rem;right:-5rem;" class="clippy-says">Great job,
+                                <span id="fileId">${file_name}</span>!</span>
                         </div>
                         <h3>Press jump to download again</h3>
                     </div>

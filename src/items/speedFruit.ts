@@ -2,6 +2,8 @@ import { Group, Mesh, Vector3, PointLight, CylinderGeometry, MeshBasicMaterial, 
 
 import { flash } from "../renderer/index";
 
+import globalTime from "../subscribe-to-global-render-loop";
+
 import { playClick, playRareFruit } from "../sound";
 
 export interface Item {
@@ -17,6 +19,7 @@ const createAndPlaceSpeedFruit = (
     rareChance: number,
     baseRadius: number = 15,
     randomColor: boolean = false,
+    shouldDance: boolean = false,
     pos: Vector3,
     increaseSpeed: (d: number) => void,
     pleaseDestroy: (g: Group) => void
@@ -56,13 +59,25 @@ const createAndPlaceSpeedFruit = (
 
     let rewarded = false;
 
+    let baseAnimate = () => {
+        cylinder.rotateOnAxis(new Vector3(1, 0, 0), 0.01);
+        cylinder.rotateOnAxis(new Vector3(0, 1, 0), 0.07);
+    };
+
+    let animate = baseAnimate;
+    if (shouldDance) {
+        let r = MathUtils.randFloat(0.2, 2);
+        animate = () => {
+            baseAnimate();
+            cylinder.position.y += Math.sin(globalTime.getTime() / 70.0) * -8.5;
+            cylinder.position.z += Math.cos(globalTime.getTime() / (1000.0) * r) * 5;
+        };
+    }
+
     return {
         obj: group,
         collidingObj: cylinder,
-        onLoop: () => {
-            cylinder.rotateOnAxis(new Vector3(1, 0, 0), 0.01);
-            cylinder.rotateOnAxis(new Vector3(0, 1, 0), 0.07);
-        },
+        onLoop: animate,
         onPlayerCollide: () => {
             if (!rewarded) {
                 rewarded = true;

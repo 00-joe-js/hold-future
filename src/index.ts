@@ -27,9 +27,12 @@ window.HYPER_BLUE = new Color(0xaaffff);
 window.POWERED_PINKRED = new Color(0xffeeee);
 // ---
 
-import TEST_UPGRADES from "./upgrades/upgrades-doc";
+import t from "./upgrades/upgrades-doc";
+import { Upgrade } from "./upgrades/gui";
 
-function shuffleArray(array: Array<any>) {
+const TEST_UPGRADES: Upgrade[] = t;
+
+function shuffleArray<T>(array: Array<T>) {
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         var temp = array[i];
@@ -39,19 +42,23 @@ function shuffleArray(array: Array<any>) {
     return array;
 }
 
-const getRandomUpgrades = (discount: number, gravitasActivated: boolean, paintActivated: boolean) => {
+const getRandomUpgrades = (discount: number, gravitasActivated: boolean, paintActivated: boolean, grantTimeForSpeed: boolean, dancing: boolean) => {
 
-    let ups = [];
+    let ups: Upgrade[] = [];
     let eligibleUpgrades = TEST_UPGRADES.slice(0);
+
+    let alwaysPick: Upgrade[] = TEST_UPGRADES.filter(u => u.alwaysPick);
 
     eligibleUpgrades = eligibleUpgrades.filter(({ name }) => {
         if (name === "Paint" && paintActivated) return false;
         if (name === "Project Gravitas" && gravitasActivated) return false;
         if (name === "Limited-Time Offer" && discount > 0) return false;
+        if (name === "Instant Rebate" && grantTimeForSpeed === true) return false;
+        if (name === "Do the Wave" && dancing === true) return false;
         return true;
     });
 
-    ups = shuffleArray(eligibleUpgrades).slice(0, 3);
+    ups = [...alwaysPick, ...shuffleArray<Upgrade>(eligibleUpgrades).slice(0, 3 - alwaysPick.length)];
 
     return ups.map(u => (
         { ...u, cost: u.cost - discount }
@@ -111,6 +118,10 @@ const startGame = async () => {
     let upgradeDiscount = 0;
     let fruitRadius = 15;
     let randomFruitColors = false;
+    let columnRate = 1;
+    let topSpeedThisLevel = 0;
+    let grantTimeBasedOnTopSpeed = false;
+    let dancingFruit = false;
 
     const {
         gameLoopFn,
@@ -163,10 +174,16 @@ const startGame = async () => {
     if (!speedInterface || !baseSpeed || !totalSpeed) throw new Error("Speed interface?");
 
     loopHooks.push((dt) => {
+        const speed = getSpeed(dt);
+        if (topSpeedThisLevel < speed) {
+            topSpeedThisLevel = speed;
+        }
         const bl = getBonusSpeed(dt) / 75;
         setBlurLevel(bl);
         if (Math.random() > .5) {
-            totalSpeed.innerText = getSpeed(dt).toFixed(2);
+            totalSpeed.innerText = speed.toFixed(2);
+            const r = speed / 100;
+            totalSpeed.style.color = `rgb(${255 - (255 * r / 2)}, ${255}, ${255 - (255 * r)})`;
             baseSpeed.innerText = getBaseSpeed().toFixed(0);
         }
     });
@@ -258,10 +275,14 @@ const startGame = async () => {
                     if (times.length > 0) {
                         const newTime = times.shift();
                         newTime && timer.grantMoreTime(newTime);
+                        if (grantTimeBasedOnTopSpeed) {
+                            timer.grantMoreTime((topSpeedThisLevel / 100) * 1.4);
+                        }
+                        topSpeedThisLevel = 0;
                         pauseRendering();
                         playScreenOpen();
                         const upgrades = getRandomUpgrades(
-                            upgradeDiscount, projectGravitasActivated, randomFruitColors
+                            upgradeDiscount, projectGravitasActivated, randomFruitColors, grantTimeBasedOnTopSpeed, dancingFruit
                         );
                         upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, (selected: number) => {
 
@@ -301,6 +322,12 @@ const startGame = async () => {
                                     fruitRadius += 30;
                                 } else if (upgradeName === "Paint") {
                                     randomFruitColors = true;
+                                } else if (upgradeName === "Sub-axis") {
+                                    columnRate -= (columnRate * .75);
+                                } else if (upgradeName === "Instant Rebate") {
+                                    grantTimeBasedOnTopSpeed = true;
+                                } else if (upgradeName === "Do the Wave") {
+                                    dancingFruit = true;
                                 }
                             }
 
@@ -341,7 +368,7 @@ const startGame = async () => {
                 const randomPoints = [];
 
                 const randZ = (trackWidth: number) => {
-                    const column = MathUtils.randInt(0, 8);
+                    const column = MathUtils.randInt(0, 8 * columnRate) * (1 / columnRate);
                     const segmentWidth = trackWidth / 20;
                     const sign = Math.random() < 0.5 ? 1 : -1;
                     return column * sign * segmentWidth;
@@ -362,7 +389,7 @@ const startGame = async () => {
                     ));
                 }
 
-                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, fruitRadius, randomFruitColors, pt, (moreSpeed: number) => {
+                items = randomPoints.map(pt => createSpeedFruit(chanceForRareFruit, fruitRadius, randomFruitColors, dancingFruit, pt, (moreSpeed: number) => {
                     grantDecayingSpeedBonus(moreSpeed * fruitBoost, 1000, globalTime.getTime());
                     changeSpeed(moreSpeed * portionForBaseSpeed);
                 }, (group: Group) => {

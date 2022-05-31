@@ -13,11 +13,12 @@ if (!container) {
     throw new Error("Loading issue? Couldn't find #upgrades-container.");
 }
 
-interface Upgrade {
+export interface Upgrade {
     name: string;
     description: string;
     cost: number;
     iconPos?: number[]
+    alwaysPick?: boolean,
 }
 
 function shuffleArray(array: Array<any>) {
@@ -34,7 +35,7 @@ const clippyUpgradeSayings = shuffleArray([
     `Ah, the trusty upgrade screen ... Choose wisely, \${file_name}!`,
     `Some upgrades are better earlier. Others are better later.`,
     `Expensive upgrades are usually very powerful. Just watch your time!`,
-    `I wonder what a super fruit tastes like. I envy you, \${file_name}!`,
+    `I wonder what a speed fruit tastes like. I envy you, \${file_name}!`,
     `Blippy, at your service!`,
     `Eating fruit gives you more overall speed and also a temporary boost!`,
     `The only thing better than speed fruit are SUPER BERRIES! Get the juicy ones.`,
@@ -45,7 +46,8 @@ const clippyUpgradeSayings = shuffleArray([
     `It seems you are having NO trouble selecting an upgrade.`,
     `Jumping can help you get delicious fruit when it counts!`,
     `Yum.`,
-    `Sometimes it's worth slowing down for nice fruit, but you should always be downloading!`
+    `Sometimes it's worth slowing down for nice fruit, but you should always be downloading!`,
+
 ]);
 
 
