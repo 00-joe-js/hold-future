@@ -285,6 +285,8 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
     let preventMovement = false;
     let trackWallZed = 2500;
 
+    let prevDt = 0;
+
     // Function to run on game loop.
     const gameLoopFn = (dt: number) => {
 
@@ -302,6 +304,16 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
         let speed = SPEED * 5;
         speed += calculateSpeedBonuses(dt);
 
+        let lastMoveTimeDiff = dt - prevDt;
+        if (lastMoveTimeDiff < 1000) {
+            speed = speed * (lastMoveTimeDiff / 16);
+        } else {
+            console.log("Applying normalized speed to hopefully reset.");
+            speed = speed;
+        }
+
+        prevDt = dt;
+
         if (gamepadState) {
             if (gamepadState.moveVel.y > 0.3) {
                 moveForward(speed, movementVector);
@@ -310,6 +322,7 @@ const setupFPSCharacter = async (camera: Camera, scene: Scene) => {
                 moveRight(speed * 0.7 * gamepadState.moveVel.x, movementVector);
             }
         } else {
+            console.log(speed);
             if (keyboard.wDown) {
                 moveForward(speed, movementVector);
             }
