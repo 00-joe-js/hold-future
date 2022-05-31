@@ -47,7 +47,10 @@ const clippyUpgradeSayings = shuffleArray([
     `Jumping can help you get delicious fruit when it counts!`,
     `Yum.`,
     `Sometimes it's worth slowing down for nice fruit, but you should always be downloading!`,
-
+    `The fruit is bigger when it gives more speed. Try to eat lots of bigger fruits.`,
+    `I wonder what kind of file you are, \${file_name} ... A great one I bet.`,
+    `We're on our way, noble internet user!`,
+    `Make haste, \${file_name}!`
 ]);
 
 
@@ -91,7 +94,7 @@ class UpgradesManager {
         moneySlot.innerText = t.toString();
     }
 
-    showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onSelection: Function) {
+    showContainer(timeCoins: number, upgradeDescriptions: Upgrade[], onLastUpgrade: boolean, onSelection: Function) {
 
         const choices = this.getChoices();
 
@@ -129,6 +132,13 @@ class UpgradesManager {
 
         this.container.style.opacity = "1.0";
         this.setCurrentSelection();
+
+        if (onLastUpgrade) {
+            const warning = this.container.querySelector<HTMLElement>("#last-upgrade");
+            if (warning) {
+                warning.style.display = "block";
+            }
+        }
 
         setTimeout(() => {
             this.listenForInputEvents((input: string) => {

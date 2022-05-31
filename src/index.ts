@@ -284,7 +284,9 @@ const startGame = async () => {
                         const upgrades = getRandomUpgrades(
                             upgradeDiscount, projectGravitasActivated, randomFruitColors, grantTimeBasedOnTopSpeed, dancingFruit
                         );
-                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, (selected: number) => {
+                        const isLastUpgrade = times.length === 0; // After shifting.
+                        console.log("raw isLast", isLastUpgrade)
+                        upgradesManager.showContainer(Math.floor(timer.getTimeLeft()), upgrades, isLastUpgrade, (selected: number) => {
 
                             if (selected === -1) {
                                 // Skip.
