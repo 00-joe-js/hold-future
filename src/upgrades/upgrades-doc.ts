@@ -10,7 +10,6 @@ export default [
         description: `<strong>Increase your base speed by 5</strong>. It's not fancy, but it's fast.`,
         cost: 5,
         iconPos: [-198, -479],
-        alwaysPick: true
     },
     {
         name: "Project Gravitas",
