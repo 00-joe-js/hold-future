@@ -95,6 +95,5 @@ export default [
         description: `<strong>Speed fruit dance</strong> their special dance. It's more fun than skipping!`,
         cost: 0,
         iconPos: [-420, -368],
-        alwaysPick: true,
     }
 ];
